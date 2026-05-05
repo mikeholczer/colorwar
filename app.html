@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Green & White - Mockup</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Bungee&family=Inter:wght@400;600;700;900&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f0fdf4; }
+        .font-display { font-family: 'Bungee', cursive; }
+        .hidden { display: none; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .sequence-item { animation: pop 0.2s ease-out; }
+        @keyframes pop { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        .active-day { @apply bg-emerald-600 text-white shadow-md; }
+    </style>
+</head>
+<body class="pb-12">
+
+    <!-- TOP NAVIGATION -->
+    <header class="bg-emerald-600 text-white shadow-lg sticky top-0 z-50">
+        <!-- Changed to flex-col for mobile, sm:flex-row for desktop -->
+        <div class="max-w-4xl mx-auto flex flex-col sm:flex-row justify-between items-center p-4 gap-4">
+            
+            <!-- Title: Centered on mobile, left-aligned on desktop -->
+            <h1 class="font-display text-lg sm:text-xl tracking-wider text-center sm:text-left">
+                <span class="text-emerald-200">Green</span><span class="text-gray-200">&</span><span class="text-white">White</span><span class="text-gray-200"> 2027</span>
+            </h1>
+            
+            <!-- Controls Group: Stacks better on mobile -->
+            <div class="flex items-center gap-2 sm:gap-3 w-full sm:w-auto justify-between sm:justify-end">
+                <!-- Score Display: Reduced min-width and adjusted padding -->
+                <div class="bg-emerald-700/50 border border-emerald-400/30 px-2 py-1 sm:px-3 sm:py-1.5 rounded-xl text-center flex-1 sm:flex-none min-w-[80px] sm:min-w-[100px]">
+                    <p class="text-[7px] sm:text-[8px] font-black uppercase tracking-widest text-emerald-300 leading-none">Most Official Score</p>
+                    <p class="text-[7px] sm:text-[8px] font-black uppercase tracking-widest text-emerald-300 leading-none">(Of All Unofficial Scores)</p>
+                    <p id="global-score-display" class="font-display text-xs sm:text-sm leading-tight">G: 0 - W: 0</p>
+                </div>
+
+                <!-- Switcher: Reduced padding for mobile -->
+                <div class="flex bg-emerald-700 rounded-lg p-1 text-[10px] sm:text-xs font-bold">
+                    <button onclick="switchView('judge')" id="btn-judge" class="px-3 py-1.5 sm:px-4 sm:py-2 rounded-md bg-emerald-500 text-white shadow-sm transition-all">JUDGE</button>
+                    <button onclick="switchView('setup')" id="btn-setup" class="px-3 py-1.5 sm:px-4 sm:py-2 rounded-md text-emerald-200 hover:text-white transition-all">SETUP</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+
+    <!-- VIEW 1: JUDGE VIEW (SCHEDULE) -->
+    <main id="view-judge" class="max-w-4xl mx-auto px-4 mt-6">
+        <nav id="day-picker" class="flex justify-center space-x-2 overflow-x-auto pb-4 no-scrollbar mb-6"></nav>
+        <div class="relative ml-4 space-y-10" id="timeline-container"></div>
+    </main>
+
+    <!-- VIEW 2: MEET/ALL-CAMP VIEW (DYNAMIC SCORING) -->
+    <main id="view-meet" class="hidden max-w-4xl mx-auto px-4 mt-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
+            <div class="flex items-center">
+                <button onclick="switchView('judge')" class="mr-4 text-emerald-600 text-xl"><i class="fas fa-arrow-left"></i></button>
+                <h2 id="meet-title" class="font-display text-emerald-800 text-2xl">Meet</h2>
+            </div>
+            <div class="bg-slate-800 text-white px-4 py-2 rounded-2xl shadow-lg text-center min-w-[160px]">
+                <p class="text-[10px] font-black uppercase tracking-widest text-emerald-300">Most Official of All Unofficial Event Scores</p>
+                <p id="meet-total-display" class="font-display text-lg">G: 0 - W: 0</p>
+                <p id="meet-status-display" class="text-[9px] font-bold uppercase tracking-tighter opacity-70 mt-1">No events scored</p>
+            </div>
+        </div>
+        <div id="meet-container" class="space-y-12"></div>
+    </main>
+
+    <!-- VIEW 3: SETUP VIEW -->
+    <main id="view-setup" class="hidden max-w-4xl mx-auto px-4 mt-6">
+        <h2 class="font-display text-emerald-800 text-2xl mb-6">Schedule Setup</h2>
+        
+        <!-- Regular Activity -->
+        <div class="bg-white rounded-3xl shadow-lg p-6 border-2 border-emerald-100 mb-8 text-sm">
+            <h3 class="font-bold text-emerald-700 mb-4 uppercase tracking-widest text-xs">Add Regular Activity</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <select id="setup-day" class="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none"><option value="1">Day 1</option><option value="2">Day 2</option><option value="3">Day 3</option><option value="4">Day 4</option><option value="5">Day 5</option></select>
+                <select id="setup-period" class="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none"><option>Morning</option><option>Rest Hour</option><option>Afternoon</option><option>Evening</option></select>
+                <select id="setup-group" class="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none"></select>
+                <select id="setup-activity" class="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none"></select>
+            </div>
+            <button onclick="addRegularActivity()" class="w-full mt-6 bg-emerald-600 text-white font-display py-3 rounded-xl shadow-lg shadow-emerald-200">ADD ACTIVITY</button>
+        </div>
+
+        <!-- All Camp Activity -->
+        <!--
+        <div class="bg-white rounded-3xl shadow-lg p-6 border-2 border-purple-100 mb-8 text-sm">
+            <h3 class="font-bold text-purple-700 mb-4 uppercase tracking-widest text-xs">Add All Camp Activity</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <select id="setup-ac-day" class="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none"><option value="1">Day 1</option><option value="2">Day 2</option><option value="3">Day 3</option><option value="4">Day 4</option><option value="5">Day 5</option></select>
+                <select id="setup-ac-period" class="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none"><option>Morning</option><option>Rest Hour</option><option>Afternoon</option><option>Evening</option></select>
+                <select id="setup-ac-type" class="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none" onchange="updateACActivityList()"></select>
+                <select id="setup-ac-event" class="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none"></select>
+            </div>
+            <button onclick="addAllCampActivity()" class="w-full mt-6 bg-purple-600 text-white font-display py-3 rounded-xl shadow-lg shadow-purple-200">ADD ALL CAMP EVENT</button>
+        </div>
+        -->
+
+        <!-- Meet -->
+        <!--
+        <div class="bg-white rounded-3xl shadow-lg p-6 border-2 border-orange-100 mb-8 text-sm">
+            <h3 class="font-bold text-orange-700 mb-4 uppercase tracking-widest text-xs">Add Meet</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <select id="setup-meet-day" class="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none"><option value="1">Day 1</option><option value="2">Day 2</option><option value="3">Day 3</option><option value="4">Day 4</option><option value="5">Day 5</option></select>
+                <select id="setup-meet-period" class="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none"><option>Morning</option><option>Rest Hour</option><option>Afternoon</option><option>Evening</option></select>
+                <select id="setup-meet-type" class="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none"></select>
+            </div>
+            <button onclick="addMeet()" class="w-full mt-6 bg-orange-600 text-white font-display py-3 rounded-xl shadow-lg shadow-orange-200">ADD MEET</button>
+        </div>
+        -->
+
+        <div class="bg-white rounded-3xl shadow-lg p-6 border-2 border-emerald-100">
+            <h3 class="font-bold text-emerald-700 mb-4 uppercase tracking-widest text-xs">Current Schedule</h3>
+            <div id="setup-list" class="space-y-2"></div>
+        </div>
+    </main>
+
+    <!-- MODAL: REGULAR ACTIVITY SCORER -->
+    <div id="regularModal" class="hidden fixed inset-0 z-[100] flex items-end sm:items-center justify-center">
+        <div onclick="closeModal('regularModal')" class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+        <div class="relative bg-white w-full max-w-md rounded-t-[2rem] sm:rounded-[2rem] shadow-2xl overflow-hidden">
+            <div class="bg-emerald-600 p-6 text-white flex justify-between items-center">
+                <div>
+                    <p id="r-period" class="text-[10px] uppercase font-black text-emerald-200 tracking-widest">Morning</p>
+                    <h2 id="r-target" class="font-display text-xl">Group Name</h2>
+                </div>
+                <button onclick="closeModal('regularModal')" class="text-emerald-200 text-2xl"><i class="fas fa-times"></i></button>
+            </div>
+            <form class="p-6 space-y-5" onsubmit="event.preventDefault(); submitRegularScore();">
+                <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100 text-center">
+                    <p class="text-xs text-gray-500 font-bold uppercase tracking-widest">Activity</p>
+                    <p id="r-activity" class="text-lg font-black text-gray-800">Soccer</p>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-center text-[10px] font-black text-emerald-600 uppercase mb-2">Green Team</label>
+                        <input id="r-score-g" type="number" placeholder="0" class="w-full text-center text-3xl font-black bg-emerald-50 border-2 border-emerald-200 rounded-2xl py-4 text-emerald-700 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-center text-[10px] font-black text-gray-500 uppercase mb-2">White Team</label>
+                        <input id="r-score-w" type="number" placeholder="0" class="w-full text-center text-3xl font-black bg-gray-50 border-2 border-gray-200 rounded-2xl py-4 text-gray-700 outline-none">
+                    </div>
+                </div>
+                <button type="submit" class="w-full bg-emerald-600 text-white font-display py-4 rounded-2xl shadow-lg shadow-emerald-200 text-lg">SUBMIT SCORE</button>
+                <div class="mt-6 pt-4 border-t border-gray-100">
+                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Activity Rules</p>
+                    <ul id="r-rules-list" class="text-xs text-gray-500 space-y-1 list-disc list-inside"></ul>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: STANDARD BUTTON SCORER -->
+    <div id="standardRegularModal" class="hidden fixed inset-0 z-[100] flex items-end sm:items-center justify-center">
+        <div onclick="closeModal('standardRegularModal')" class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+        <div class="relative bg-white w-full max-w-md rounded-t-[2rem] sm:rounded-[2rem] shadow-2xl overflow-hidden">
+            <div class="bg-slate-800 p-6 text-white">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p id="s-period" class="text-[10px] uppercase font-black text-emerald-400 tracking-widest">Morning</p>
+                        <h2 id="s-target" class="font-display text-xl leading-tight">Group Name</h2>
+                    </div>
+                    <button onclick="closeModal('standardRegularModal')" class="text-slate-400 text-2xl"><i class="fas fa-times"></i></button>
+                </div>
+            </div>
+            <div class="p-6">
+                <p class="text-center text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6">Select Result</p>
+                <div class="grid grid-cols-1 gap-4">
+                    <!-- Green Button -->
+                    <button onclick="selectStandardOption('G')" id="btn-score-G" class="flex items-center justify-between bg-emerald-600 p-5 rounded-2xl shadow-lg transition-all transform active:scale-95">
+                        <span class="font-display text-2xl text-white">Green</span>
+                        <span class="bg-white/20 px-3 py-1 rounded-lg text-xs font-bold text-white">20 PTS</span>
+                    </button>
+                    <!-- White Button -->
+                    <button onclick="selectStandardOption('W')" id="btn-score-W" class="flex items-center justify-between bg-slate-700 p-5 rounded-2xl shadow-lg transition-all transform active:scale-95">
+                        <span class="font-display text-2xl text-white">White</span>
+                        <span class="bg-white/20 px-3 py-1 rounded-lg text-xs font-bold text-white">20 PTS</span>
+                    </button>
+                    <!-- Tie Button -->
+                    <button onclick="selectStandardOption('T')" id="btn-score-T" class="flex items-center justify-between bg-gray-500 p-5 rounded-2xl shadow-lg transition-all transform active:scale-95">
+                        <span class="font-display text-2xl text-white">Tie</span>
+                        <span class="bg-white/20 px-3 py-1 rounded-lg text-xs font-bold text-white">10 PTS EACH</span>
+                    </button>
+                </div>
+                <div class="mt-8">
+                    <button onclick="submitStandardScore()" id="btn-submit-standard" class="w-full bg-emerald-600 text-white font-display py-4 rounded-2xl shadow-lg opacity-50 cursor-not-allowed" disabled>SUBMIT SCORE</button>
+                </div>
+            </div>
+            <div class="px-6 pb-6 space-y-4">
+                <div class="bg-slate-50 rounded-xl p-3 border border-slate-100">
+                    <p id="s-activity" class="text-center text-sm font-bold text-slate-700">Activity Name</p>
+                </div>
+
+                <!-- Rules Section -->
+                <div class="text-xs">
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Activity Rules</p>
+                    <ul id="s-rules-list" class="text-slate-500 space-y-1 list-disc list-inside"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- MODAL: MEET SEQUENCE SCORER -->
+    <div id="meetModal" class="hidden fixed inset-0 z-[100] flex items-end sm:items-center justify-center">
+        <div onclick="closeModal('meetModal')" class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+        <div class="relative bg-white w-full max-w-md rounded-t-[2rem] sm:rounded-[2rem] shadow-2xl overflow-hidden">
+            <div class="bg-slate-800 p-6 text-white">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p id="m-type" class="text-[10px] uppercase font-black text-orange-400 tracking-widest">Individual</p>
+                        <h2 id="m-name" class="font-display text-xl leading-tight">Event Name</h2>
+                    </div>
+                    <button onclick="closeModal('meetModal')" class="text-slate-400 text-2xl"><i class="fas fa-times"></i></button>
+                </div>
+            </div>
+            <div class="p-6 bg-slate-50 border-b border-slate-100">
+                <p class="text-center text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Finishing Order</p>
+                <div id="sequence-track" class="flex justify-center space-x-3"></div>
+            </div>
+            <div class="p-6 space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <button onclick="addSequenceResult('G')" class="flex flex-col items-center justify-center bg-emerald-600 p-6 rounded-3xl shadow-lg shadow-emerald-200">
+                        <span class="font-display text-4xl text-white">G</span>
+                        <span class="text-[10px] font-black text-emerald-100 uppercase mt-1">Green</span>
+                    </button>
+                    <button onclick="addSequenceResult('W')" class="flex flex-col items-center justify-center bg-slate-700 p-6 rounded-3xl shadow-lg shadow-slate-200">
+                        <span class="font-display text-4xl text-white">W</span>
+                        <span class="text-[10px] font-black text-slate-300 uppercase mt-1">White</span>
+                    </button>
+                </div>
+                <div class="flex space-x-3">
+                    <button onclick="undoSequence()" class="flex-1 bg-gray-100 text-gray-600 font-black py-4 rounded-2xl text-xs uppercase tracking-widest">Undo</button>
+                    <button onclick="submitMeetScore()" id="btn-submit-meet" class="flex-[2] bg-emerald-600 text-white font-display py-4 rounded-2xl shadow-lg opacity-50 cursor-not-allowed" disabled>SUBMIT</button>
+                </div>
+            </div>
+            <div id="meet-preview" class="hidden px-6 pb-6">
+                <div class="bg-emerald-50 rounded-2xl p-4 border border-emerald-200 flex justify-between items-center">
+                    <div class="text-emerald-800 text-sm font-bold" id="preview-text">Green: 5 | White: 0</div>
+                    <i class="fas fa-check-circle text-emerald-500 text-xl"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tracks which periods are collapsed (e.g., { 'Morning': true })
+        let collapsedPeriods = {'1-Morning': false, '1-Rest Hour': true, '1-Afternoon': true, '1-Evening': true,
+                                '2-Morning': false, '2-Rest Hour': true, '2-Afternoon': true, '2-Evening': false,
+                                '3-Morning': false, '3-Rest Hour': true, '3-Afternoon': true, '3-Evening': false,
+                                '4-Morning': true, '4-Rest Hour': true, '4-Afternoon': true, '4-Evening': true,
+                                '5-Morning': true, '5-Rest Hour': false, '5-Afternoon': false, '5-Evening': false}; 
+
+        // --- CONFIGURATION & DATA ---
+        const GROUPS = [
+            { name: 'Scouts/Tumblers', gender: 'G' }, { name: 'TPJs', gender: 'B' },
+            { name: 'Bows', gender: 'G' }, { name: 'Archers', gender: 'B' },
+            { name: 'Quills', gender: 'G' }, { name: 'Yeomen', gender: 'B' },
+            { name: 'Arrows', gender: 'G' }, { name: 'Lancers', gender: 'B' },
+            { name: 'Bards', gender: 'G' }, { name: 'Friars', gender: 'B' },
+            { name: 'Shires', gender: 'G' }, { name: 'Foresters', gender: 'B' },
+            { name: 'Scribes', gender: 'G' }, { name: 'Saxons', gender: 'B' },
+            { name: 'Female Staff', gender: 'G' }, { name: 'Male Staff', gender: 'B' }
+        ];
+
+        const MEET_CONFIGS = {
+            track: {
+                title: 'Track & Field Meet',
+                icon: 'fa-running',
+                color: 'from-orange-500 to-red-600',
+                border: 'border-orange-400',
+                events: [
+                    { name: '100 Yard Dash', type: 'ind' },
+                    { name: '4x100 Relay', type: 'relay' },
+                    { name: 'Giant Relay', type: 'giant' },
+                    { name: 'Shot Put', type: 'ind' },
+                    { name: 'Long Jump', type: 'ind' },
+                    { name: 'Long Distance', type: 'ind' }
+                ]
+            },
+            swim: {
+                title: 'All Camp Swim Meet',
+                icon: 'fa-swimmer',
+                color: 'from-sky-500 to-blue-600',
+                border: 'border-sky-400',
+                events: [
+                    { name: '25yd Freestyle', type: 'ind' },
+                    { name: '25yd Breaststroke', type: 'ind' },
+                    { name: '25yd Backstroke', type: 'ind' },
+                    { name: '4x25 Relay', type: 'relay' },
+                    { name: 'Giant Relay', type: 'giant' }
+                ]
+            },
+            cracker: {
+                title: 'Cracker Eating',
+                icon: 'fa-cookie-bite',
+                color: 'from-yellow-400 to-yellow-600',
+                border: 'border-yellow-500',
+                events: [{ name: 'Cracker Eating', type: 'ind' }]
+            },
+            tugsOfWar: {
+                title: 'Tug of War',
+                icon: 'fa-hand-rock',
+                color: 'from-gray-700 to-gray-900',
+                border: 'border-gray-800',
+                events: [{ name: 'Tug of War', type: 'giant' }]
+            }
+        };
+
+        const ALL_CAMP_CONFIGS = {
+            talentNight: {
+                title: 'Talent Night',
+                icon: 'fa-star',
+                color: 'from-purple-600 to-indigo-700',
+                border: 'border-purple-400',
+                events: [
+                    { name: 'Dance', type: 'ind', participants: ['Junior Camp', 'Senior Camp'] },
+                    { name: 'Musical', type: 'ind', participants: ['Junior Camp', 'Senior Camp'] },
+                    { name: 'Comedy', type: 'ind', participants: ['Junior Camp', 'Senior Camp'] }
+                ]
+            },
+            obstacleRelay: {
+                title: 'Giant Obstacle Relay',
+                icon: 'fa-person-running',
+                color: 'from-indigo-500 to-purple-600',
+                border: 'border-indigo-400',
+                events: [
+                    { name: 'First Leg', type: 'relay', participants: ['All Camp'] },
+                    { name: 'Second Leg', type: 'relay', participants: ['All Camp'] },
+                    { name: 'Final Leg', type: 'relay', participants: ['All Camp'] }
+                ]
+            },
+            flagPresentation: {
+                title: 'Flag Presentation',
+                icon: 'fa-flag',
+                color: 'from-green-500 to-green-700',
+                border: 'border-green-400',
+                events: [
+                    { name: 'Flag', type: 'relay', participants: ['All Camp'] },
+                    { name: 'Presentation', type: 'relay', participants: ['All Camp'] }
+                ]
+            },
+            songNight: {
+                title: 'Song Night',
+                icon: 'fa-music',
+                color: 'from-pink-500 to-red-500',
+                border: 'border-pink-400',
+                events: [
+                    { name: 'Camp Song', type: 'relay', participants: ['All Camp'] },
+                    { name: 'Group Alma Mater', type: 'relay', participants: ['All Camp'] },
+                    { name: 'Original Medley', type: 'relay', participants: ['All Camp'] },
+                    { name: 'Original Alma Mater', type: 'relay', participants: ['All Camp'] }
+                ]
+            }
+        };
+
+        // STATE
+        let currentDay = 1;
+        let currentView = 'judge';
+        let regularActivities = [
+            { id: 1, day: 1, period: 'Morning', group: 'Scouts/Tumblers', activityId: 1, scored: false, g: 0, w: 0 },
+            { id: 2, day: 1, period: 'Morning', group: 'TPJs', activityId: 9, scored: false, g: 0, w: 0 },
+            { id: 3, day: 1, period: 'Morning', group: 'Bows', activityId: 3, scored: false, g: 0, w: 0 },
+            { id: 4, day: 1, period: 'Morning', group: 'Archers', activityId: 4, scored: false, g: 0, w: 0 },
+            { id: 5, day: 1, period: 'Morning', group: 'Quills', activityId: 5, scored: false, g: 0, w: 0 },
+            { id: 6, day: 1, period: 'Morning', group: 'Yeomen', activityId: 6, scored: false, g: 0, w: 0 },
+            { id: 7, day: 1, period: 'Morning', group: 'Arrows', activityId: 1, scored: false, g: 0, w: 0 },
+            { id: 8, day: 1, period: 'Morning', group: 'Lancers', activityId: 2, scored: false, g: 0, w: 0 },
+            { id: 9, day: 1, period: 'Morning', group: 'Bards', activityId: 3, scored: false, g: 0, w: 0 },
+            { id: 10, day: 1, period: 'Morning', group: 'Friars', activityId: 4, scored: false, g: 0, w: 0 },
+            { id: 11, day: 1, period: 'Morning', group: 'Shires', activityId: 5, scored: false, g: 0, w: 0 },
+            { id: 12, day: 1, period: 'Morning', group: 'Foresters', activityId: 6, scored: false, g: 0, w: 0 },
+            { id: 13, day: 1, period: 'Morning', group: 'Scribes', activityId: 1, scored: false, g: 0, w: 0 },
+            { id: 14, day: 1, period: 'Morning', group: 'Saxons', activityId: 2, scored: false, g: 0, w: 0 },
+            { id: 15, day: 1, period: 'Rest Hour', group: 'Scouts/Tumblers', activityId: 2, scored: false, g: 0, w: 0 },
+            { id: 16, day: 1, period: 'Rest Hour', group: 'TPJs', activityId: 3, scored: false, g: 0, w: 0 },
+            { id: 17, day: 1, period: 'Rest Hour', group: 'Bows', activityId: 4, scored: false, g: 0, w: 0 },
+            { id: 18, day: 1, period: 'Rest Hour', group: 'Archers', activityId: 5, scored: false, g: 0, w: 0 },
+            { id: 19, day: 1, period: 'Rest Hour', group: 'Quills', activityId: 6, scored: false, g: 0, w: 0 },
+            { id: 20, day: 1, period: 'Rest Hour', group: 'Yeomen', activityId: 7, scored: false, g: 0, w: 0 },
+            { id: 21, day: 1, period: 'Rest Hour', group: 'Arrows', activityId: 8, scored: false, g: 0, w: 0 },
+            { id: 22, day: 1, period: 'Rest Hour', group: 'Lancers', activityId: 1, scored: false, g: 0, w: 0 },
+            { id: 23, day: 1, period: 'Rest Hour', group: 'Bards', activityId: 2, scored: false, g: 0, w: 0 },
+            { id: 24, day: 1, period: 'Rest Hour', group: 'Friars', activityId: 3, scored: false, g: 0, w: 0 },
+            { id: 25, day: 1, period: 'Rest Hour', group: 'Shires', activityId: 4, scored: false, g: 0, w: 0 },
+            { id: 26, day: 1, period: 'Rest Hour', group: 'Foresters', activityId: 5, scored: false, g: 0, w: 0 },
+            { id: 27, day: 1, period: 'Rest Hour', group: 'Scribes', activityId: 6, scored: false, g: 0, w: 0 },
+            { id: 28, day: 1, period: 'Rest Hour', group: 'Saxons', activityId: 7, scored: false, g: 0, w: 0 },
+            { id: 29, day: 1, period: 'Afternoon', group: 'Scouts/Tumblers', activityId: 3, scored: false, g: 0, w: 0 },
+            { id: 30, day: 1, period: 'Afternoon', group: 'TPJs', activityId: 4, scored: false, g: 0, w: 0 },
+            { id: 31, day: 1, period: 'Afternoon', group: 'Bows', activityId: 5, scored: false, g: 0, w: 0 },
+            { id: 32, day: 1, period: 'Afternoon', group: 'Archers', activityId: 6, scored: false, g: 0, w: 0 },
+            { id: 33, day: 1, period: 'Afternoon', group: 'Quills', activityId: 7, scored: false, g: 0, w: 0 },
+            { id: 34, day: 1, period: 'Afternoon', group: 'Yeomen', activityId: 8, scored: false, g: 0, w: 0 },
+            { id: 35, day: 1, period: 'Afternoon', group: 'Arrows', activityId: 1, scored: false, g: 0, w: 0 },
+            { id: 36, day: 1, period: 'Afternoon', group: 'Lancers', activityId: 2, scored: false, g: 0, w: 0 },
+            { id: 37, day: 1, period: 'Afternoon', group: 'Bards', activityId: 3, scored: false, g: 0, w: 0 },
+            { id: 38, day: 1, period: 'Afternoon', group: 'Friars', activityId: 4, scored: false, g: 0, w: 0 },
+            { id: 39, day: 1, period: 'Afternoon', group: 'Shires', activityId: 5, scored: false, g: 0, w: 0 },
+            { id: 40, day: 1, period: 'Afternoon', group: 'Foresters', activityId: 6, scored: false, g: 0, w: 0 },
+            { id: 41, day: 1, period: 'Afternoon', group: 'Scribes', activityId: 1, scored: false, g: 0, w: 0 },
+            { id: 42, day: 1, period: 'Afternoon', group: 'Saxons', activityId: 2, scored: false, g: 0, w: 0 },
+            { id: 43, day: 1, period: 'Evening', group: 'Female Staff', activityId: 7, scored: false, g: 0, w: 0 },
+            { id: 44, day: 1, period: 'Evening', group: 'Male Staff', activityId: 7, scored: false, g: 0, w: 0 }
+        ];
+
+        let activities = [
+            { id: 1, name: 'Kickball', scorer: 'standard', rules: ['Standard kickball rules apply.','6 Innings'] },
+            { id: 2, name: 'Softball', scorer: 'standard', rules: ['Standard softball rules apply.','6 Innings'] },
+            { id: 3, name: 'Soccer', scorer: 'standard', rules: ['Standard soccer rules apply.', 'Junior camp 7 minute quarters', 'Senior camp 15 minute halves', 'Staff 20 minute halves'] },
+            { id: 4, name: 'Frolf', scorer: 'standard', rules: ['Each team has two players.', 'First team to 10 points wins', 'Must win by 2 points'] },
+            { id: 5, name: 'Dodgeball', scorer: 'standard', rules: ['A player hit the ball is out.', 'If a player catches the ball, the thrower is out.', 'Last team standing wins', 'Best of 3 games'] },
+            { id: 6, name: 'Gagaball', scorer: 'standard', rules: ['Player hit by the ball below the waist is out.', 'If a player hits the ball twice with it hitting a wall or another player they are out.', 'Last team standing wins', 'Best of 3 games'] },
+            { id: 7, name: 'Basketball', scorer: 'standard', rules: ['Standard Basketball rules apply.', 'Junior camp 7 minute quarters', 'Senior camp 15 minute halves', 'Staff 20 minute halves'] },
+            { id: 8, name: 'Volleyball', scorer: 'standard', rules: ['Standard volleyball rules apply.', 'First to 21 with the game', 'Must win by 2 points', 'Open scoring', 'Switch sides when game score adds to 11', 'Best of 3 games'] },
+            { id: 9, name: 'Tennis', scorer: 'custom', rules: ['5 G+W points per game', '2 Singles', '2 Doubles', 'Each match is a 8 game pro set'] }
+        ];
+        let meets = [
+            { type: 'swim', day: 2, period: 'Morning' },
+            { type: 'track', day: 3, period: 'Morning' },
+            { type: 'cracker', day: 2, period: 'Evening' },
+            { type: 'tugsOfWar', day: 5, period: 'Rest Hour' }
+        ];
+        let allCampActivities = [
+            { type: 'talentNight', day: 3, period: 'Evening' },
+            { type: 'obstacleRelay', day: 5, period: 'Afternoon' },
+            { type: 'flagPresentation', day: 5, period: 'Evening' },
+            { type: 'songNight', day: 5, period: 'Evening' }
+        ];
+        let meetScores = {}; // Key: "type|eventName|groupName"
+        let activeMeetScore = { type: '', event: '', group: '', eventType: '', sequence: [] };
+        let activeRegularScore = null;
+        let activeConfigMode = 'meet'; // 'meet' or 'allcamp'
+        let selectedStandardOption = null; 
+
+
+        // --- INITIALIZATION ---
+        function init() {
+            renderDayPicker();
+            renderSetupGroupDropdown();
+            renderSetupActivityDropdown();
+            // renderSetupMeetDropdown();
+            // renderSetupACDropdown();
+            renderJudgeView();
+            updateGlobalScore();
+        }
+
+        function updateGlobalScore() {
+            let totalG = 0;
+            let totalW = 0;
+
+            // 1. Sum Regular Activities
+            regularActivities.forEach(a => {
+                if (a.scored) {
+                    totalG += a.g;
+                    totalW += a.w;
+                }
+            });
+
+            // 2. Sum Meet Scores
+            Object.values(meetScores).forEach(s => {
+                totalG += s.g;
+                totalW += s.w;
+            });
+
+            const display = document.getElementById('global-score-display');
+            if (display) {
+                display.innerText = `G: ${totalG} - W: ${totalW}`;
+            }
+        }
+
+        // Function to handle the toggle
+        function togglePeriod(day, period) {
+            const key = `${day}-${period}`;
+            collapsedPeriods[key] = !collapsedPeriods[key];
+            renderJudgeView();
+        }
+
+        // --- VIEW SWITCHING ---
+        function switchView(view) {
+            currentView = view;
+            ['view-judge', 'view-setup', 'view-meet'].forEach(v => {
+                document.getElementById(v).classList.add('hidden');
+            });
+            document.getElementById('view-' + view).classList.remove('hidden');
+            
+            document.getElementById('btn-judge').className = view === 'judge' ? "px-4 py-2 rounded-md bg-emerald-500 text-white shadow-sm transition-all" : "px-4 py-2 rounded-md text-emerald-200 hover:text-white transition-all";
+            document.getElementById('btn-setup').className = view === 'setup' ? "px-4 py-2 rounded-md bg-emerald-500 text-white shadow-sm transition-all" : "px-4 py-2 rounded-md text-emerald-200 hover:text-white transition-all";
+
+            if (view === 'judge') renderJudgeView();
+            if (view === 'setup') renderSetupList();
+            window.scrollTo(0, 0);
+        }
+
+        function setDay(day) {
+            currentDay = day;
+            renderDayPicker();
+            renderJudgeView();
+        }
+
+        // --- RENDERERS ---
+
+        function renderSetupActivityDropdown() {
+            const select = document.getElementById('setup-activity');
+            select.innerHTML = '<option value="">Select Activity</option>';
+            activities.forEach(a => {
+                const opt = document.createElement('option');
+                opt.value = a.id;
+                opt.innerText = a.name;
+                select.appendChild(opt);
+            });
+        }
+
+        function renderSetupMeetDropdown() {
+            const select = document.getElementById('setup-meet-type');
+            select.innerHTML = '';
+            Object.keys(MEET_CONFIGS).forEach(key => {
+                const opt = document.createElement('option');
+                opt.value = key;
+                opt.innerText = MEET_CONFIGS[key].title;
+                select.appendChild(opt);
+            });
+        }
+
+        function renderSetupACDropdown() {
+            const select = document.getElementById('setup-ac-type');
+            select.innerHTML = '';
+            Object.keys(ALL_CAMP_CONFIGS).forEach(key => {
+                const opt = document.createElement('option');
+                opt.value = key;
+                opt.innerText = ALL_CAMP_CONFIGS[key].title;
+                select.appendChild(opt);
+            });
+            updateACActivityList();
+        }
+
+        function selectStandardOption(option) {
+            selectedStandardOption = option;
+            
+            // Reset all button styles
+            ['G', 'W', 'T'].forEach(opt => {
+                const btn = document.getElementById(`btn-score-${opt}`);
+                btn.classList.remove('ring-4', 'ring-emerald-400', 'ring-offset-2');
+                btn.classList.add('opacity-50');
+            });
+
+            // Highlight selected button
+            const selectedBtn = document.getElementById(`btn-score-${option}`);
+            selectedBtn.classList.remove('opacity-50');
+            selectedBtn.classList.add('ring-4', 'ring-emerald-400', 'ring-offset-2');
+
+            // Enable submit button
+            const submitBtn = document.getElementById('btn-submit-standard');
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+
+        function submitStandardScore() {
+            let g = 0, w = 0;
+            if (selectedStandardOption === 'G') { g = 20; w = 0; }
+            else if (selectedStandardOption === 'W') { g = 0; w = 20; }
+            else if (selectedStandardOption === 'T') { g = 10; w = 10; }
+
+            const act = regularActivities.find(a => a.id === activeRegularScore.id);
+            act.scored = true; 
+            act.g = g; 
+            act.w = w;
+
+            closeModal('standardRegularModal');
+            selectedStandardOption = null; // Reset
+            updateGlobalScore();
+            renderJudgeView();
+        }
+
+        function updateACActivityList() {
+            const type = document.getElementById('setup-ac-type').value;
+            const select = document.getElementById('setup-ac-event');
+            select.innerHTML = '';
+            if (ALL_CAMP_CONFIGS[type]) {
+                ALL_CAMP_CONFIGS[type].events.forEach(ev => {
+                    const opt = document.createElement('option');
+                    opt.value = ev.name;
+                    opt.innerText = ev.name;
+                    select.appendChild(opt);
+                });
+            }
+        }
+
+        function renderDayPicker() {
+            const container = document.getElementById('day-picker');
+            container.innerHTML = '';
+            for (let i = 1; i <= 5; i++) {
+                const btn = document.createElement('button');
+                btn.innerText = `Day ${i}`;
+                btn.className = `flex-shrink-0 px-3 py-1.5 sm:px-5 sm:py-2 rounded-full font-bold text-xs sm:text-base shadow-sm border transition-all ${currentDay === i ? 'bg-emerald-600 text-white shadow-md' : 'bg-white text-emerald-600'}`;
+                btn.onclick = () => setDay(i);
+                container.appendChild(btn);
+            }
+        }
+
+        function renderJudgeView() {
+            const container = document.getElementById('timeline-container');
+            container.innerHTML = '';
+            const periods = ['Morning', 'Rest Hour', 'Afternoon', 'Evening'];
+
+            periods.forEach(period => {
+                // 1. Create a unique key for this specific day and period
+                const periodKey = `${currentDay}-${period}`;
+                const isCollapsed = collapsedPeriods[periodKey] || false;
+                
+                const section = document.createElement('div');
+                section.className = "relative mb-8";
+                
+                section.innerHTML = `
+                    <!-- Removed the 'absolute' dot div from here -->
+                    <div onclick="togglePeriod(${currentDay}, '${period}')" class="flex items-center justify-between cursor-pointer group mb-4 ml-4 gap-3">
+                        <i class="fas fa-chevron-${isCollapsed ? 'right' : 'down'} text-emerald-400 text-xs transition-transform duration-200"></i>
+                        <h2 class="text-emerald-800 font-black text-lg uppercase tracking-tighter group-hover:text-emerald-600 transition-colors">
+                            ${period}
+                        </h2>
+                    </div>
+                    <div id="period-${period.replace(/\s/g, '')}" class="${isCollapsed ? 'hidden' : 'block'} space-y-3 ml-4"></div>
+                `;
+
+                container.appendChild(section);
+                const periodGrid = section.querySelector(`#period-${period.replace(/\s/g, '')}`);
+
+                // --- The logic below remains the same as your original code ---
+                const periodMeets = meets.filter(m => m.day === currentDay && m.period === period);
+                const periodACs = allCampActivities.filter(a => a.day === currentDay && a.period === period);
+                const periodActs = regularActivities.filter(a => a.day === currentDay && a.period === period);
+
+                // Render Meets
+                periodMeets.forEach(meet => {
+                    const config = MEET_CONFIGS[meet.type];
+                    const summary = getMeetSummary(meet.type);
+                    const card = document.createElement('div');
+                    card.className = `bg-gradient-to-r ${config.color} rounded-2xl p-5 border-2 ${config.border} flex items-center justify-between shadow-xl cursor-pointer transform active:scale-95 transition-all`;
+                    card.innerHTML = `
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center text-white text-2xl"><i class="fas ${config.icon}"></i></div>
+                            <div class="flex flex-col">
+                                <p class="text-white font-black text-xl tracking-tight">${config.title}</p>
+                                <p class="text-white/70 text-[10px] font-bold uppercase tracking-widest">${summary.scored} / ${summary.total} events scored</p>
+                            </div>
+                        </div>
+                        <div class="text-left">
+                            <p class="text-white font-display text-lg leading-tight">G: ${summary.g}</p>
+                            <p class="text-white font-display text-lg leading-tight">W: ${summary.w}</p>
+                        </div>`;
+                    card.onclick = () => openMeetView(meet.type);
+                    periodGrid.appendChild(card);
+                });
+
+                // Render All Camp Events
+                periodACs.forEach(acMatch => {
+                    const config = ALL_CAMP_CONFIGS[acMatch.type];
+                    const summary = getMeetSummary(acMatch.type);
+                    const card = document.createElement('div');
+                    card.className = `bg-gradient-to-r ${config.color} rounded-2xl p-5 border-2 ${config.border} flex items-center justify-between shadow-xl cursor-pointer transform active:scale-95 transition-all`;
+                    card.innerHTML = `
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center text-white text-2xl"><i class="fas ${config.icon}"></i></div>
+                            <div class="flex flex-col">
+                                <p class="text-white font-black text-xl tracking-tight">${config.title}</p>
+                                <p class="text-white/70 text-[10px] font-bold uppercase tracking-widest">${summary.scored} / ${summary.total} events scored</p>
+                            </div>
+                        </div>
+                        <div class="text-left">
+                            <p class="text-white font-display text-lg leading-tight">G: ${summary.g}</p>
+                            <p class="text-white font-display text-lg leading-tight">W: ${summary.w}</p>
+                        </div>`;
+                    card.onclick = () => openMeetView(acMatch.type);
+                    periodGrid.appendChild(card);
+                });
+
+                // Render Regular Activities
+                periodActs.forEach(act => {
+                    const card = document.createElement('div');
+                    const isWin = act.scored && act.g > act.w;
+                    const isLoss = act.scored && act.w > act.g;
+                    card.className = `rounded-xl p-3 border-2 flex justify-between items-center shadow-sm cursor-pointer transition-all ${
+                        act.scored ? (isWin ? 'bg-emerald-50 border-emerald-500' : isLoss ? 'bg-slate-50 border-slate-400' : 'bg-gray-50 border-gray-300') : 'bg-white border-gray-200'
+                    }`;
+                    card.innerHTML = `
+                        <div class="flex items-center space-x-3">
+                            <div class="w-1 h-8 rounded-full ${act.scored ? (isWin ? 'bg-emerald-500' : isLoss ? 'bg-slate-400' : 'bg-gray-300') : 'bg-gray-200'}"></div>
+                            <div class="${act.scored ? 'text-gray-800' : 'text-gray-400'}">
+                                <p class="text-sm font-bold">${act.group} <span class="font-normal text-xs opacity-60">• ${getActivityNameById(act.activityId)}</span></p>
+                                <p class="text-[11px] font-black uppercase ${act.scored ? (isWin ? 'text-emerald-600' : isLoss ? 'text-slate-600' : 'text-gray-500') : ''}">
+                                    ${act.scored ? `G: ${act.g} - W: ${act.w}` : 'Not yet scored'}
+                                </p>
+                            </div>
+                        </div>
+                        <button class="text-[10px] font-black px-3 py-2 rounded-lg ${act.scored ? 'bg-gray-600 text-white' : 'bg-emerald-600 text-white shadow-lg shadow-emerald-100'}">DETAILS</button>`;
+                    card.onclick = () => openRegularModal(act);
+                    periodGrid.appendChild(card);
+                });
+
+                if (periodMeets.length === 0 && periodACs.length === 0 && periodActs.length === 0) {
+                    periodGrid.innerHTML = `<p class="text-gray-400 text-xs italic py-2">No activities scheduled</p>`;
+                }
+            });
+        }
+
+        function openMeetView(type) {
+            const config = MEET_CONFIGS[type] || ALL_CAMP_CONFIGS[type];
+            switchView('meet');
+            document.getElementById('meet-title').innerText = config.title;
+            renderMeetScoring(type);
+        }
+
+        function renderMeetScoring(type) {
+            const config = MEET_CONFIGS[type] || ALL_CAMP_CONFIGS[type];
+            const container = document.getElementById('meet-container');
+            container.innerHTML = ''; 
+
+            config.events.forEach(event => {
+                const section = document.createElement('section');
+                section.className = "mb-12";
+                const headerBadge = document.createElement('div');
+                headerBadge.className = "bg-slate-800 text-white px-4 py-1 rounded-lg inline-block mb-4 shadow-md";
+                const headerText = document.createElement('h3');
+                headerText.className = "font-black text-xs uppercase tracking-widest";
+                headerText.textContent = event.name; 
+                headerBadge.appendChild(headerText);
+                const grid = document.createElement('div');
+                grid.className = "grid grid-cols-1 gap-3";
+                section.appendChild(headerBadge);
+                section.appendChild(grid);
+                container.appendChild(section);
+
+                // Determine Participants: If event has participants array, use it. Else use GROUPS.
+                let participants = [];
+                if (event.participants) {
+                    participants = event.participants.map(p => ({ name: p }));
+                } else {
+                    participants = GROUPS;
+                }
+
+                participants.forEach(participant => {
+                    const key = `${type}|${event.name}|${participant.name}`;
+                    const score = meetScores[key];
+                    const card = document.createElement('div');
+                    card.className = "rounded-xl p-4 border-2 flex justify-between items-center shadow-sm cursor-pointer transition-all";
+                    const infoDiv = document.createElement('div');
+                    
+                    if (score) {
+                        const isWin = score.g > score.w;
+                        if (isWin) {
+                            card.classList.add('bg-emerald-50', 'border-emerald-500', 'text-emerald-800');
+                            infoDiv.className = "text-emerald-800";
+                        } else {
+                            card.classList.add('bg-slate-50', 'border-slate-400', 'text-slate-800');
+                            infoDiv.className = "text-slate-800";
+                        }
+                        const nameP = document.createElement('p');
+                        nameP.className = "text-sm font-bold";
+                        nameP.textContent = participant.name;
+                        const subP = document.createElement('p');
+                        subP.className = "text-[10px] font-normal opacity-50 ml-2";
+                        subP.textContent = event.name;
+                        const scoreP = document.createElement('p');
+                        scoreP.className = `text-[11px] font-black uppercase mt-1 ${isWin ? 'text-emerald-600' : 'text-slate-600'}`;
+                        scoreP.textContent = `Green: ${score.g} - White: ${score.w}`;
+                        nameP.appendChild(subP);
+                        infoDiv.appendChild(nameP);
+                        infoDiv.appendChild(scoreP);
+                        const editBtn = document.createElement('button');
+                        editBtn.className = "bg-slate-600 text-white px-4 py-2 rounded-xl text-xs font-black";
+                        editBtn.textContent = "EDIT";
+                        card.appendChild(infoDiv);
+                        card.appendChild(editBtn);
+                    } else {
+                        card.classList.add('bg-white', 'border-gray-200');
+                        infoDiv.className = "text-gray-400";
+                        const nameP = document.createElement('p');
+                        nameP.className = "text-sm font-bold";
+                        nameP.textContent = participant.name;
+                        const subP = document.createElement('p');
+                        subP.className = "font-normal text-xs";
+                        subP.textContent = "• " + event.name;
+                        const statusP = document.createElement('p');
+                        statusP.className = "text-[10px] font-bold uppercase";
+                        statusP.textContent = "Not yet scored";
+                        nameP.appendChild(subP);
+                        infoDiv.appendChild(nameP);
+                        infoDiv.appendChild(statusP);
+                        const addBtn = document.createElement('button');
+                        addBtn.className = "bg-emerald-600 text-white px-4 py-2 rounded-xl text-xs font-black shadow-lg shadow-emerald-100";
+                        addBtn.textContent = "ADD SCORE";
+                        card.appendChild(infoDiv);
+                        card.appendChild(addBtn);
+                    }
+                    card.onclick = () => openMeetModal(type, event, participant.name);
+                    grid.appendChild(card);
+                });
+            });
+            updateMeetTotal(type);
+        }
+
+        // --- MEET SCORING ENGINE ---
+
+        function openMeetModal(type, event, participantName) {
+            activeMeetScore = { type, event: event.name, group: participantName, eventType: event.type, sequence: [] };
+            document.getElementById('m-name').innerText = event.name;
+            document.getElementById('m-type').innerText = event.type.toUpperCase();
+            renderMeetSequenceUI();
+            document.getElementById('meetModal').classList.remove('hidden');
+            document.getElementById('meet-preview').classList.add('hidden');
+            document.getElementById('btn-submit-meet').disabled = true;
+            document.getElementById('btn-submit-meet').classList.add('opacity-50', 'cursor-not-allowed');
+        }
+
+        function renderMeetSequenceUI() {
+            const track = document.getElementById('sequence-track');
+            track.innerHTML = '';
+            const slots = activeMeetScore.eventType === 'ind' ? 4 : 2;
+            for (let i = 0; i < slots; i++) {
+                const slot = document.createElement('div');
+                slot.className = `w-12 h-14 rounded-xl border-2 flex items-center justify-center text-xl font-black transition-all ${activeMeetScore.sequence[i] ? 'sequence-item shadow-md' : 'border-dashed border-slate-200'}`;
+                if (activeMeetScore.sequence[i] === 'G') slot.classList.add('bg-emerald-500', 'border-emerald-600', 'text-white');
+                if (activeMeetScore.sequence[i] === 'W') slot.classList.add('bg-slate-700', 'border-slate-800', 'text-white');
+                if (activeMeetScore.sequence[i] === 'G') slot.innerText = 'G';
+                if (activeMeetScore.sequence[i] === 'W') slot.innerText = 'W';
+                track.appendChild(slot);
+            }
+        }
+
+        function addSequenceResult(team) {
+            const slots = activeMeetScore.eventType === 'ind' ? 4 : 2;
+            activeMeetScore.sequence.push(team);
+            const gCount = activeMeetScore.sequence.filter(t => t === 'G').length;
+            const wCount = activeMeetScore.sequence.filter(t => t === 'W').length;
+            const quota = slots / 2;
+            if (gCount === quota) { while (activeMeetScore.sequence.length < slots) activeMeetScore.sequence.push('W'); }
+            else if (wCount === quota) { while (activeMeetScore.sequence.length < slots) activeMeetScore.sequence.push('G'); }
+            renderMeetSequenceUI();
+            calculateMeetPoints();
+        }
+
+        function undoSequence() {
+            const slots = activeMeetScore.eventType === 'ind' ? 4 : 2;
+            if (activeMeetScore.sequence.length >= slots) activeMeetScore.sequence = [];
+            else activeMeetScore.sequence.pop();
+            renderMeetSequenceUI();
+            calculateMeetPoints();
+        }
+
+        function calculateMeetPoints() {
+            let g = 0, w = 0;
+            const seq = activeMeetScore.sequence;
+            if (activeMeetScore.eventType === 'ind') {
+                const scoring = [5, 3, 1, 0];
+                seq.forEach((team, idx) => {
+                    if (team === 'G') g += scoring[idx];
+                    if (team === 'W') w += scoring[idx];
+                });
+            } else {
+                const pts = activeMeetScore.eventType === 'giant' ? 20 : 5;
+                if (seq[0] === 'G') g = pts;
+                if (seq[0] === 'W') w = pts;
+            }
+            const slots = activeMeetScore.eventType === 'ind' ? 4 : 2;
+            if (seq.length === slots) {
+                document.getElementById('btn-submit-meet').disabled = false;
+                document.getElementById('btn-submit-meet').classList.remove('opacity-50', 'cursor-not-allowed');
+                document.getElementById('meet-preview').classList.remove('hidden');
+                document.getElementById('preview-text').innerText = `Green: ${g} | White: ${w}`;
+            } else {
+                document.getElementById('btn-submit-meet').disabled = true;
+                document.getElementById('btn-submit-meet').classList.add('opacity-50', 'cursor-not-allowed');
+                document.getElementById('meet-preview').classList.add('hidden');
+            }
+        }
+
+        function submitMeetScore() {
+            let g = 0, w = 0;
+            const seq = activeMeetScore.sequence;
+            if (activeMeetScore.eventType === 'ind') {
+                const scoring = [5, 3, 1, 0];
+                seq.forEach((team, idx) => {
+                    if (team === 'G') g += scoring[idx];
+                    if (team === 'W') w += scoring[idx];
+                });
+            } else {
+                const pts = activeMeetScore.eventType === 'giant' ? 20 : 5;
+                if (seq[0] === 'G') g = pts;
+                if (seq[0] === 'W') w = pts;
+            }
+            const key = `${activeMeetScore.type}|${activeMeetScore.event}|${activeMeetScore.group}`;
+            meetScores[key] = { g, w };
+            closeModal('meetModal');
+            renderMeetScoring(activeMeetScore.type);
+            if (currentView === 'meet') renderJudgeView();
+            updateGlobalScore();
+        }
+
+        function updateMeetTotal(type) {
+            let totalG = 0, totalW = 0, scoredCount = 0;
+            const config = MEET_CONFIGS[type] || ALL_CAMP_CONFIGS[type];
+            
+            // Calculate total expected based on unique participants per event
+            let totalExpected = 0;
+            config.events.forEach(ev => {
+                totalExpected += (ev.participants ? ev.participants.length : GROUPS.length);
+            });
+
+            Object.keys(meetScores).forEach(key => {
+                if (key.startsWith(type + '|')) {
+                    const s = meetScores[key];
+                    totalG += s.g;
+                    totalW += s.w;
+                    scoredCount++;
+                }
+            });
+
+            document.getElementById('meet-total-display').innerText = `G: ${totalG} - W: ${totalW}`;
+            const statusEl = document.getElementById('meet-status-display');
+            if (scoredCount === 0) {
+                statusEl.innerText = "No events scored";
+                statusEl.className = "text-[9px] font-bold uppercase tracking-tighter opacity-70 mt-1";
+            } else if (scoredCount < totalExpected) {
+                statusEl.innerText = `${scoredCount} / ${totalExpected} events scored`;
+                statusEl.className = "text-[9px] font-bold uppercase tracking-tighter text-orange-400 mt-1";
+            } else {
+                statusEl.innerText = "All events scored";
+                statusEl.className = "text-[9px] font-bold uppercase tracking-tighter text-emerald-300 mt-1";
+            }
+        }
+
+        function getMeetSummary(type) {
+            let totalG = 0, totalW = 0, scoredCount = 0;
+            const config = MEET_CONFIGS[type] || ALL_CAMP_CONFIGS[type];
+            let totalExpected = 0;
+            config.events.forEach(ev => { totalExpected += (ev.participants ? ev.participants.length : GROUPS.length); });
+
+            Object.keys(meetScores).forEach(key => {
+                if (key.startsWith(type + '|')) {
+                    const s = meetScores[key];
+                    totalG += s.g;
+                    totalW += s.w;
+                    scoredCount++;
+                }
+            });
+            return { g: totalG, w: totalW, scored: scoredCount, total: totalExpected };
+        }
+
+        // --- REGULAR ACTIVITY SCORING ---
+        function openRegularModal(act) {
+            activeRegularScore = act;
+            const activityData = activities.find(a => a.id === act.activityId);
+
+            if (activityData.scorer === 'custom') {
+                // --- NUMBER INPUT LOGIC ---
+                document.getElementById('r-target').innerText = act.group;
+                document.getElementById('r-activity').innerText = getActivityNameById(act.activityId);
+                document.getElementById('r-period').innerText = act.period;
+                document.getElementById('r-score-g').value = act.scored ? act.g : '';
+                document.getElementById('r-score-w').value = act.scored ? act.w : '';
+                
+                const rulesList = document.getElementById('r-rules-list');
+                rulesList.innerHTML = '';
+                if (activityData && activityData.rules.length > 0) {
+                    activityData.rules.forEach(rule => {
+                        const li = document.createElement('li');
+                        li.className = "leading-relaxed";
+                        li.innerText = rule;
+                        rulesList.appendChild(li);
+                    });
+                } else {
+                    rulesList.innerHTML = '<li class="italic">No specific rules defined for this activity.</li>';
+                }
+                document.getElementById('regularModal').classList.remove('hidden');
+                
+            } else {
+                // --- BUTTON-BASED LOGIC ---
+                document.getElementById('s-target').innerText = act.group;
+                document.getElementById('s-period').innerText = act.period;
+                document.getElementById('s-activity').innerText = getActivityNameById(act.activityId);
+                
+                // NEW: Populate the rules for the Standard Scorer
+                const sRulesList = document.getElementById('s-rules-list');
+                sRulesList.innerHTML = '';
+                if (activityData && activityData.rules.length > 0) {
+                    activityData.rules.forEach(rule => {
+                        const li = document.createElement('li');
+                        li.className = "leading-relaxed";
+                        li.innerText = rule;
+                        sRulesList.appendChild(li);
+                    });
+                } else {
+                    sRulesList.innerHTML = '<li class="italic">No specific rules defined for this activity.</li>';
+                }
+
+                // Reset UI state
+                if (act.scored) {
+                    // Determine which option was previously selected based on the points logic
+                    let existingOption = null;
+                    if (act.g === 20 && act.w === 0) existingOption = 'G';
+                    else if (act.w === 20 && act.g === 0) existingOption = 'W';
+                    else if (act.g === 10 && act.w === 10) existingOption = 'T';
+
+                    if (existingOption) {
+                        selectStandardOption(existingOption);
+                    } else {
+                        // Fallback if data is inconsistent
+                        resetStandardUI();
+                    }
+                } else {
+                    // If not scored, reset to default empty state
+                    resetStandardUI();
+                }
+
+                document.getElementById('standardRegularModal').classList.remove('hidden');
+            }
+        }
+
+        function resetStandardUI() {
+            selectedStandardOption = null;
+            const submitBtn = document.getElementById('btn-submit-standard');
+            submitBtn.disabled = true;
+            submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            ['G', 'W', 'T'].forEach(opt => {
+                const btn = document.getElementById(`btn-score-${opt}`);
+                btn.classList.remove('ring-4', 'ring-emerald-400', 'ring-offset-2');
+                btn.classList.add('opacity-50');
+            });
+        }
+
+        function submitRegularScore() {
+            const g = parseInt(document.getElementById('r-score-g').value) || 0;
+            const w = parseInt(document.getElementById('r-score-w').value) || 0;
+            const act = regularActivities.find(a => a.id === activeRegularScore.id);
+            act.scored = true; act.g = g; act.w = w;
+            closeModal('regularModal');
+            updateGlobalScore();
+            renderJudgeView();
+        }
+
+        // --- SETUP ENGINE ---
+        function renderSetupGroupDropdown() {
+            const select = document.getElementById('setup-group');
+            GROUPS.forEach(g => {
+                const opt = document.createElement('option');
+                opt.value = g.name; opt.innerText = g.name;
+                select.appendChild(opt);
+            });
+        }
+
+        function addRegularActivity() {
+            const day = parseInt(document.getElementById('setup-day').value);
+            const period = document.getElementById('setup-period').value;
+            const group = document.getElementById('setup-group').value;
+            const activityId = parseInt(document.getElementById('setup-activity').value);
+            if (!activityId) return alert('Select an activity');
+            regularActivities.push({ id: Date.now(), day, period, group, activityId, scored: false, g: 0, w: 0 });
+            renderSetupList();
+        }
+
+        function addMeet() {
+            const day = parseInt(document.getElementById('setup-meet-day').value);
+            const period = document.getElementById('setup-meet-period').value;
+            const type = document.getElementById('setup-meet-type').value;
+            if(!type) return alert('Select a meet type');
+            meets.push({ type, day, period });
+            renderSetupList();
+        }
+
+        function addAllCampActivity() {
+            const day = parseInt(document.getElementById('setup-ac-day').value);
+            const period = document.getElementById('setup-ac-period').value;
+            const type = document.getElementById('setup-ac-type').value;
+            const eventName = document.getElementById('setup-ac-event').value;
+            if(!type || !eventName) return alert('Select activity');
+            allCampActivities.push({ type, day, period });
+            renderSetupList();
+        }
+
+        function renderSetupList() {
+            const list = document.getElementById('setup-list');
+            list.innerHTML = '';
+            // Merge all for the setup list
+            const all = [
+                ...regularActivities.map(a => ({ ...a, category: 'REG', label: `${a.group} • ${getActivityNameById(a.activityId)}`, color: 'emerald' })),
+                ...meets.map(m => ({ id: m.type + m.day + m.period, category: 'MEET', label: MEET_CONFIGS[m.type].title, color: 'orange', day: m.day, period: m.period, type: m.type })),
+                ...allCampActivities.map(a => ({ id: a.type + a.day + a.period, category: 'ALL-CAMP', label: ALL_CAMP_CONFIGS[a.type].title, color: 'purple', day: a.day, period: a.period, type: a.type }))
+            ];
+            
+            all.sort((a,b) => a.day - b.day).forEach(item => {
+                const div = document.createElement('div');
+                div.className = "flex justify-between items-center p-3 bg-gray-50 rounded-xl border border-gray-100 text-xs";
+                div.innerHTML = `
+                    <div>
+                        <span class="font-black text-${item.color}-600">D${item.day} ${item.period}</span>
+                        <span class="ml-2 font-bold text-gray-700">${item.label}</span>
+                    </div>
+                    <button onclick="deleteFromSetup('${item.category}', '${item.id}')" class="text-red-400"><i class="fas fa-trash"></i></button>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function deleteFromSetup(cat, id) {
+            if(cat === 'REG') regularActivities = regularActivities.filter(a => a.id != id);
+            if(cat === 'MEET') meets = meets.filter(m => !(m.type + m.day + m.period === id));
+            if(cat === 'ALL-CAMP') allCampActivities = allCampActivities.filter(a => !(a.type + a.day + a.period === id));
+            renderSetupList();
+        }
+
+        function getActivityNameById(id) {
+            const act = activities.find(a => a.id === id);
+            return act ? act.name : 'Unknown';
+        }
+
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+        
+        init();
+    </script>
+</body>
+</html>
