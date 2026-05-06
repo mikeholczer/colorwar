@@ -247,6 +247,41 @@
         </div>
     </div>
 
+    <!-- MODAL: SINGLE WINNER SCORER -->
+    <div id="winnerModal" class="hidden fixed inset-0 z-[100] flex items-end sm:items-center justify-center">
+        <div onclick="closeModal('winnerModal')" class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+        <div class="relative bg-white w-full max-w-md rounded-t-[2rem] sm:rounded-[2rem] shadow-2xl overflow-hidden">
+            <div class="bg-slate-800 p-6 text-white">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p id="w-type" class="text-[10px] uppercase font-black text-orange-400 tracking-widest">Winner</p>
+                        <h2 id="w-name" class="font-display text-xl leading-tight">Event Name</h2>
+                    </div>
+                    <button onclick="closeModal('winnerModal')" class="text-slate-400 text-2xl"><i class="fas fa-times"></i></button>
+                </div>
+            </div>
+            <div class="p-6 space-y-4">
+                <p class="text-center text-[10px] font-black text-slate-400 uppercase tracking-widest">Who Won?</p>
+                <div class="grid grid-cols-1 gap-4">
+                    <!-- Green Winner Button -->
+                    <button onclick="selectWinner('G')" id="btn-win-G" class="flex items-center justify-between bg-emerald-600 p-6 rounded-2xl shadow-lg transition-all transform active:scale-95">
+                        <span class="font-display text-3xl text-white">GREEN</span>
+                        <i class="fas fa-trophy text-white text-2xl opacity-50"></i>
+                    </button>
+                    <!-- White Winner Button -->
+                    <button onclick="selectWinner('W')" id="btn-win-W" class="flex items-center justify-between bg-slate-700 p-6 rounded-2xl shadow-lg transition-all transform active:scale-95">
+                        <span class="font-display text-3xl text-white">WHITE</span>
+                        <i class="fas fa-trophy text-white text-2xl opacity-50"></i>
+                    </button>
+                </div>
+                <div class="mt-8">
+                    <button onclick="submitWinnerScore()" id="btn-submit-winner" class="w-full bg-emerald-600 text-white font-display py-4 rounded-2xl shadow-lg opacity-50 cursor-not-allowed" disabled>SUBMIT RESULT</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <script>
         // Tracks which periods are collapsed (e.g., { 'Morning': true })
         let collapsedPeriods = {'1-Morning': false, '1-Rest Hour': true, '1-Afternoon': true, '1-Evening': true,
@@ -307,7 +342,7 @@
                 icon: 'fa-hand-rock',
                 color: 'from-gray-700 to-gray-900',
                 border: 'border-gray-800',
-                events: [{ name: 'Tug of War', type: 'giant' }]
+                events: [{ name: 'Tug of War', type: 'winner' }]
             }
         };
 
@@ -435,8 +470,8 @@
         let activeMeetScore = { type: '', event: '', group: '', eventType: '', sequence: [] };
         let activeRegularScore = null;
         let activeConfigMode = 'meet'; // 'meet' or 'allcamp'
-        let selectedStandardOption = null; 
-
+        let selectedStandardOption = null;
+        let selectedWinner = null;
 
         // --- INITIALIZATION ---
         function init() {
@@ -806,6 +841,12 @@
         // --- MEET SCORING ENGINE ---
 
         function openMeetModal(type, event, participantName) {
+            // If it's the new 'winner' type, open the simple modal instead
+            if (event.type === 'winner') {
+                openWinnerModal(type, event, participantName);
+                return;
+            }
+
             activeMeetScore = { type, event: event.name, group: participantName, eventType: event.type, sequence: [] };
             document.getElementById('m-name').innerText = event.name;
             document.getElementById('m-type').innerText = event.type.toUpperCase();
@@ -815,6 +856,7 @@
             document.getElementById('btn-submit-meet').disabled = true;
             document.getElementById('btn-submit-meet').classList.add('opacity-50', 'cursor-not-allowed');
         }
+
 
         function renderMeetSequenceUI() {
             const track = document.getElementById('sequence-track');
@@ -895,6 +937,88 @@
             const key = `${activeMeetScore.type}|${activeMeetScore.event}|${activeMeetScore.group}`;
             meetScores[key] = { g, w };
             closeModal('meetModal');
+            renderMeetScoring(activeMeetScore.type);
+            if (currentView === 'meet') renderJudgeView();
+            updateGlobalScore();
+        }
+
+        function openWinnerModal(type, event, participantName) {
+            // 1. Construct the unique key used to store scores
+            const key = `${type}|${event.name}|${participantName}`;
+            const existingScore = meetScores[key];
+
+            // 2. Initialize the active score state
+            activeMeetScore = { 
+                type: type, 
+                event: event.name, 
+                group: participantName, 
+                eventType: 'winner', 
+                sequence: [] 
+            };
+
+            document.getElementById('w-name').innerText = event.name;
+
+            // 3. Check if we are EDITING or ADDING
+            if (existingScore) {
+                // If Green has points, they were the winner
+                if (existingScore.g > 0) {
+                    selectedWinner = 'G';
+                } 
+                // If White has points, they were the winner
+                else if (existingScore.w > 0) {
+                    selectedWinner = 'W';
+                }
+            } else {
+                selectedWinner = null;
+            }
+
+            // 4. Show the modal
+            document.getElementById('winnerModal').classList.remove('hidden');
+
+            // 5. Update the UI to reflect the selection (or lack thereof)
+            if (selectedWinner) {
+                // This will highlight the correct button and enable the submit button
+                selectWinner(selectedWinner);
+            } else {
+                // Reset to "empty" state for new scores
+                ['G', 'W'].forEach(opt => {
+                    const btn = document.getElementById(`btn-win-${opt}`);
+                    btn.classList.remove('ring-4', 'ring-emerald-400', 'ring-offset-2');
+                    btn.classList.add('opacity-50');
+                });
+                const submitBtn = document.getElementById('btn-submit-winner');
+                submitBtn.disabled = true;
+                submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+        }
+
+
+        function selectWinner(team) {
+            selectedWinner = team;
+            ['G', 'W'].forEach(opt => {
+                const btn = document.getElementById(`btn-win-${opt}`);
+                btn.classList.remove('ring-4', 'ring-emerald-400', 'ring-offset-2');
+                btn.classList.add('opacity-50');
+            });
+
+            const selectedBtn = document.getElementById(`btn-win-${team}`);
+            selectedBtn.classList.remove('opacity-50');
+            selectedBtn.classList.add('ring-4', 'ring-emerald-400', 'ring-offset-2');
+
+            const submitBtn = document.getElementById('btn-submit-winner');
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+
+        function submitWinnerScore() {
+            let g = 0, w = 0;
+            if (selectedWinner === 'G') { g = 20; w = 0; }
+            else if (selectedWinner === 'W') { g = 0; w = 20; }
+
+            const key = `${activeMeetScore.type}|${activeMeetScore.event}|${activeMeetScore.group}`;
+            meetScores[key] = { g, w };
+            
+            closeModal('winnerModal');
             renderMeetScoring(activeMeetScore.type);
             if (currentView === 'meet') renderJudgeView();
             updateGlobalScore();
