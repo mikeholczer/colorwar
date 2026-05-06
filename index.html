@@ -138,11 +138,11 @@
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-center text-[10px] font-black text-emerald-600 uppercase mb-2">Green Team</label>
-                        <input id="r-score-g" type="number" placeholder="0" class="w-full text-center text-3xl font-black bg-emerald-50 border-2 border-emerald-200 rounded-2xl py-4 text-emerald-700 outline-none">
+                        <input id="r-score-g" type="number" step=".25" inputmode="decimal" placeholder="0" class="w-full text-center text-3xl font-black bg-emerald-50 border-2 border-emerald-200 rounded-2xl py-4 text-emerald-700 outline-none">
                     </div>
                     <div>
                         <label class="block text-center text-[10px] font-black text-gray-500 uppercase mb-2">White Team</label>
-                        <input id="r-score-w" type="number" placeholder="0" class="w-full text-center text-3xl font-black bg-gray-50 border-2 border-gray-200 rounded-2xl py-4 text-gray-700 outline-none">
+                        <input id="r-score-w" type="number" step=".25" inputmode="decimal" placeholder="0" class="w-full text-center text-3xl font-black bg-gray-50 border-2 border-gray-200 rounded-2xl py-4 text-gray-700 outline-none">
                     </div>
                 </div>
                 <button type="submit" class="w-full bg-emerald-600 text-white font-display py-4 rounded-2xl shadow-lg shadow-emerald-200 text-lg">SUBMIT SCORE</button>
@@ -1171,8 +1171,9 @@
         }
 
         function submitRegularScore() {
-            const g = parseInt(document.getElementById('r-score-g').value) || 0;
-            const w = parseInt(document.getElementById('r-score-w').value) || 0;
+            // Changed parseInt to parseFloat to allow decimal values
+            const g = parseFloat(document.getElementById('r-score-g').value) || 0;
+            const w = parseFloat(document.getElementById('r-score-w').value) || 0;
             const act = regularActivities.find(a => a.id === activeRegularScore.id);
             act.scored = true; act.g = g; act.w = w;
             closeModal('regularModal');
