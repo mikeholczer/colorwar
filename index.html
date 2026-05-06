@@ -480,10 +480,9 @@
                             );
 
                             if (!alreadyHasActivity) {
-                                // 4. Select an activity from the activities array
-                                // We use math to rotate the activity index so groups aren't all doing the same thing
-                                const activityIndex = (day + groupIdx + period.length) % activities.length;
-                                const selectedActivity = activities[activityIndex];
+                                // 4. Select a random activity from the activities array
+                                const randomIndex = Math.floor(Math.random() * activities.length);
+                                const selectedActivity = activities[randomIndex];
 
                                 regularActivities.push({
                                     id: nextId++,
