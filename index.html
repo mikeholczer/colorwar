@@ -247,7 +247,7 @@
         </div>
     </div>
 
-    <!-- MODAL: SINGLE WINNER SCORER -->
+       <!-- MODAL: SINGLE WINNER SCORER -->
     <div id="winnerModal" class="hidden fixed inset-0 z-[100] flex items-end sm:items-center justify-center">
         <div onclick="closeModal('winnerModal')" class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
         <div class="relative bg-white w-full max-w-md rounded-t-[2rem] sm:rounded-[2rem] shadow-2xl overflow-hidden">
@@ -262,16 +262,21 @@
             </div>
             <div class="p-6 space-y-4">
                 <p class="text-center text-[10px] font-black text-slate-400 uppercase tracking-widest">Who Won?</p>
-                <div class="grid grid-cols-1 gap-4">
+                <div class="grid grid-cols-1 gap-3">
                     <!-- Green Winner Button -->
-                    <button onclick="selectWinner('G')" id="btn-win-G" class="flex items-center justify-between bg-emerald-600 p-6 rounded-2xl shadow-lg transition-all transform active:scale-95">
-                        <span class="font-display text-3xl text-white">GREEN</span>
-                        <i class="fas fa-trophy text-white text-2xl opacity-50"></i>
+                    <button onclick="selectWinner('G')" id="btn-win-G" class="flex items-center justify-between bg-emerald-600 p-5 rounded-2xl shadow-lg transition-all transform active:scale-95">
+                        <span class="font-display text-2xl text-white">Green</span>
+                        <span class="bg-white/20 px-3 py-1 rounded-lg text-xs font-bold text-white">20 PTS</span>
                     </button>
                     <!-- White Winner Button -->
-                    <button onclick="selectWinner('W')" id="btn-win-W" class="flex items-center justify-between bg-slate-700 p-6 rounded-2xl shadow-lg transition-all transform active:scale-95">
-                        <span class="font-display text-3xl text-white">WHITE</span>
-                        <i class="fas fa-trophy text-white text-2xl opacity-50"></i>
+                    <button onclick="selectWinner('W')" id="btn-win-W" class="flex items-center justify-between bg-slate-700 p-5 rounded-2xl shadow-lg transition-all transform active:scale-95">
+                        <span class="font-display text-2xl text-white">White</span>
+                        <span class="bg-white/20 px-3 py-1 rounded-lg text-xs font-bold text-white">20 PTS</span>
+                    </button>
+                    <!-- Tie Button -->
+                    <button onclick="selectWinner('T')" id="btn-win-T" class="flex items-center justify-between bg-gray-500 p-5 rounded-2xl shadow-lg transition-all transform active:scale-95">
+                        <span class="font-display text-2xl text-white">Tie</span>
+                        <span class="bg-white/20 px-3 py-1 rounded-lg text-xs font-bold text-white">10 PTS EACH</span>
                     </button>
                 </div>
                 <div class="mt-8">
@@ -280,7 +285,6 @@
             </div>
         </div>
     </div>
-
 
     <script>
         // Tracks which periods are collapsed (e.g., { 'Morning': true })
@@ -943,11 +947,9 @@
         }
 
         function openWinnerModal(type, event, participantName) {
-            // 1. Construct the unique key used to store scores
             const key = `${type}|${event.name}|${participantName}`;
             const existingScore = meetScores[key];
 
-            // 2. Initialize the active score state
             activeMeetScore = { 
                 type: type, 
                 event: event.name, 
@@ -958,30 +960,25 @@
 
             document.getElementById('w-name').innerText = event.name;
 
-            // 3. Check if we are EDITING or ADDING
             if (existingScore) {
-                // If Green has points, they were the winner
-                if (existingScore.g > 0) {
+                if (existingScore.g === 10 && existingScore.w === 10) {
+                    selectedWinner = 'T'; // It's a tie
+                } else if (existingScore.g > 0) {
                     selectedWinner = 'G';
-                } 
-                // If White has points, they were the winner
-                else if (existingScore.w > 0) {
+                } else if (existingScore.w > 0) {
                     selectedWinner = 'W';
                 }
             } else {
                 selectedWinner = null;
             }
 
-            // 4. Show the modal
             document.getElementById('winnerModal').classList.remove('hidden');
 
-            // 5. Update the UI to reflect the selection (or lack thereof)
             if (selectedWinner) {
-                // This will highlight the correct button and enable the submit button
                 selectWinner(selectedWinner);
             } else {
-                // Reset to "empty" state for new scores
-                ['G', 'W'].forEach(opt => {
+                // Reset UI to empty state
+                ['G', 'W', 'T'].forEach(opt => {
                     const btn = document.getElementById(`btn-win-${opt}`);
                     btn.classList.remove('ring-4', 'ring-emerald-400', 'ring-offset-2');
                     btn.classList.add('opacity-50');
@@ -992,19 +989,22 @@
             }
         }
 
-
         function selectWinner(team) {
             selectedWinner = team;
-            ['G', 'W'].forEach(opt => {
+            
+            // Reset all three buttons
+            ['G', 'W', 'T'].forEach(opt => {
                 const btn = document.getElementById(`btn-win-${opt}`);
                 btn.classList.remove('ring-4', 'ring-emerald-400', 'ring-offset-2');
                 btn.classList.add('opacity-50');
             });
 
+            // Highlight selected button
             const selectedBtn = document.getElementById(`btn-win-${team}`);
             selectedBtn.classList.remove('opacity-50');
             selectedBtn.classList.add('ring-4', 'ring-emerald-400', 'ring-offset-2');
 
+            // Enable submit
             const submitBtn = document.getElementById('btn-submit-winner');
             submitBtn.disabled = false;
             submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
@@ -1014,6 +1014,7 @@
             let g = 0, w = 0;
             if (selectedWinner === 'G') { g = 20; w = 0; }
             else if (selectedWinner === 'W') { g = 0; w = 20; }
+            else if (selectedWinner === 'T') { g = 10; w = 10; }
 
             const key = `${activeMeetScore.type}|${activeMeetScore.event}|${activeMeetScore.group}`;
             meetScores[key] = { g, w };
