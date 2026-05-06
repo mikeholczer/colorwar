@@ -401,50 +401,8 @@
         let currentDay = 1;
         let currentView = 'judge';
         let regularActivities = [
-            { id: 1, day: 1, period: 'Morning', group: 'Scouts/Tumblers', activityId: 1, scored: false, g: 0, w: 0 },
-            { id: 2, day: 1, period: 'Morning', group: 'TPJs', activityId: 9, scored: false, g: 0, w: 0 },
-            { id: 3, day: 1, period: 'Morning', group: 'Bows', activityId: 3, scored: false, g: 0, w: 0 },
-            { id: 4, day: 1, period: 'Morning', group: 'Archers', activityId: 4, scored: false, g: 0, w: 0 },
-            { id: 5, day: 1, period: 'Morning', group: 'Quills', activityId: 5, scored: false, g: 0, w: 0 },
-            { id: 6, day: 1, period: 'Morning', group: 'Yeomen', activityId: 6, scored: false, g: 0, w: 0 },
-            { id: 7, day: 1, period: 'Morning', group: 'Arrows', activityId: 1, scored: false, g: 0, w: 0 },
-            { id: 8, day: 1, period: 'Morning', group: 'Lancers', activityId: 2, scored: false, g: 0, w: 0 },
-            { id: 9, day: 1, period: 'Morning', group: 'Bards', activityId: 3, scored: false, g: 0, w: 0 },
-            { id: 10, day: 1, period: 'Morning', group: 'Friars', activityId: 4, scored: false, g: 0, w: 0 },
-            { id: 11, day: 1, period: 'Morning', group: 'Shires', activityId: 5, scored: false, g: 0, w: 0 },
-            { id: 12, day: 1, period: 'Morning', group: 'Foresters', activityId: 6, scored: false, g: 0, w: 0 },
-            { id: 13, day: 1, period: 'Morning', group: 'Scribes', activityId: 1, scored: false, g: 0, w: 0 },
-            { id: 14, day: 1, period: 'Morning', group: 'Saxons', activityId: 2, scored: false, g: 0, w: 0 },
-            { id: 15, day: 1, period: 'Rest Hour', group: 'Scouts/Tumblers', activityId: 2, scored: false, g: 0, w: 0 },
-            { id: 16, day: 1, period: 'Rest Hour', group: 'TPJs', activityId: 3, scored: false, g: 0, w: 0 },
-            { id: 17, day: 1, period: 'Rest Hour', group: 'Bows', activityId: 4, scored: false, g: 0, w: 0 },
-            { id: 18, day: 1, period: 'Rest Hour', group: 'Archers', activityId: 5, scored: false, g: 0, w: 0 },
-            { id: 19, day: 1, period: 'Rest Hour', group: 'Quills', activityId: 6, scored: false, g: 0, w: 0 },
-            { id: 20, day: 1, period: 'Rest Hour', group: 'Yeomen', activityId: 7, scored: false, g: 0, w: 0 },
-            { id: 21, day: 1, period: 'Rest Hour', group: 'Arrows', activityId: 8, scored: false, g: 0, w: 0 },
-            { id: 22, day: 1, period: 'Rest Hour', group: 'Lancers', activityId: 1, scored: false, g: 0, w: 0 },
-            { id: 23, day: 1, period: 'Rest Hour', group: 'Bards', activityId: 2, scored: false, g: 0, w: 0 },
-            { id: 24, day: 1, period: 'Rest Hour', group: 'Friars', activityId: 3, scored: false, g: 0, w: 0 },
-            { id: 25, day: 1, period: 'Rest Hour', group: 'Shires', activityId: 4, scored: false, g: 0, w: 0 },
-            { id: 26, day: 1, period: 'Rest Hour', group: 'Foresters', activityId: 5, scored: false, g: 0, w: 0 },
-            { id: 27, day: 1, period: 'Rest Hour', group: 'Scribes', activityId: 6, scored: false, g: 0, w: 0 },
-            { id: 28, day: 1, period: 'Rest Hour', group: 'Saxons', activityId: 7, scored: false, g: 0, w: 0 },
-            { id: 29, day: 1, period: 'Afternoon', group: 'Scouts/Tumblers', activityId: 3, scored: false, g: 0, w: 0 },
-            { id: 30, day: 1, period: 'Afternoon', group: 'TPJs', activityId: 4, scored: false, g: 0, w: 0 },
-            { id: 31, day: 1, period: 'Afternoon', group: 'Bows', activityId: 5, scored: false, g: 0, w: 0 },
-            { id: 32, day: 1, period: 'Afternoon', group: 'Archers', activityId: 6, scored: false, g: 0, w: 0 },
-            { id: 33, day: 1, period: 'Afternoon', group: 'Quills', activityId: 7, scored: false, g: 0, w: 0 },
-            { id: 34, day: 1, period: 'Afternoon', group: 'Yeomen', activityId: 8, scored: false, g: 0, w: 0 },
-            { id: 35, day: 1, period: 'Afternoon', group: 'Arrows', activityId: 1, scored: false, g: 0, w: 0 },
-            { id: 36, day: 1, period: 'Afternoon', group: 'Lancers', activityId: 2, scored: false, g: 0, w: 0 },
-            { id: 37, day: 1, period: 'Afternoon', group: 'Bards', activityId: 3, scored: false, g: 0, w: 0 },
-            { id: 38, day: 1, period: 'Afternoon', group: 'Friars', activityId: 4, scored: false, g: 0, w: 0 },
-            { id: 39, day: 1, period: 'Afternoon', group: 'Shires', activityId: 5, scored: false, g: 0, w: 0 },
-            { id: 40, day: 1, period: 'Afternoon', group: 'Foresters', activityId: 6, scored: false, g: 0, w: 0 },
-            { id: 41, day: 1, period: 'Afternoon', group: 'Scribes', activityId: 1, scored: false, g: 0, w: 0 },
-            { id: 42, day: 1, period: 'Afternoon', group: 'Saxons', activityId: 2, scored: false, g: 0, w: 0 },
-            { id: 43, day: 1, period: 'Evening', group: 'Female Staff', activityId: 7, scored: false, g: 0, w: 0 },
-            { id: 44, day: 1, period: 'Evening', group: 'Male Staff', activityId: 7, scored: false, g: 0, w: 0 }
+            { id: 1, day: 1, period: 'Evening', group: 'Female Staff', activityId: 7, scored: false, g: 0, w: 0 },
+            { id: 2, day: 1, period: 'Evening', group: 'Male Staff', activityId: 7, scored: false, g: 0, w: 0 },
         ];
 
         let activities = [
@@ -479,6 +437,7 @@
 
         // --- INITIALIZATION ---
         function init() {
+            populateRegularActivities();
             renderDayPicker();
             renderSetupGroupDropdown();
             renderSetupActivityDropdown();
@@ -486,6 +445,61 @@
             // renderSetupACDropdown();
             renderJudgeView();
             updateGlobalScore();
+        }
+
+        function populateRegularActivities() {
+            const targetPeriods = ['Morning', 'Rest Hour', 'Afternoon'];
+            // The names of the groups we want to skip
+            const excludedGroups = ['Female Staff', 'Male Staff']; 
+
+            // Determine starting ID to avoid overwriting existing activities
+            let nextId = regularActivities.length > 0 
+                ? Math.max(...regularActivities.map(a => a.id)) + 1 
+                : 1;
+
+            for (let day = 1; day <= 5; day++) {
+                for (const period of targetPeriods) {
+                    
+                    // 1. Check if this specific Day + Period is blocked by a Meet or All Camp Activity
+                    const isPeriodOccupied = meets.some(m => m.day === day && m.period === period) || 
+                                            allCampActivities.some(ac => ac.day === day && ac.period === period);
+
+                    if (!isPeriodOccupied) {
+                        // 2. Iterate through every group in the GROUPS array
+                        GROUPS.forEach((group, groupIdx) => {
+                            
+                            if (excludedGroups.includes(group.name)) {
+                                return; // This acts like 'continue' in a forEach loop
+                            }
+
+                            // 3. Check if this group already has an activity in this period
+                            const alreadyHasActivity = regularActivities.some(ra => 
+                                ra.day === day && 
+                                ra.period === period && 
+                                ra.group === group.name
+                            );
+
+                            if (!alreadyHasActivity) {
+                                // 4. Select an activity from the activities array
+                                // We use math to rotate the activity index so groups aren't all doing the same thing
+                                const activityIndex = (day + groupIdx + period.length) % activities.length;
+                                const selectedActivity = activities[activityIndex];
+
+                                regularActivities.push({
+                                    id: nextId++,
+                                    day: day,
+                                    period: period,
+                                    group: group.name,
+                                    activityId: selectedActivity.id,
+                                    scored: false,
+                                    g: 0,
+                                    w: 0
+                                });
+                            }
+                        });
+                    }
+                }
+            }
         }
 
         function updateGlobalScore() {
