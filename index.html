@@ -41,6 +41,7 @@
                 <!-- Switcher: Reduced padding for mobile -->
                 <div class="flex bg-emerald-700 rounded-lg p-1 text-[10px] sm:text-xs font-bold">
                     <button onclick="switchView('judge')" id="btn-judge" class="px-3 py-1.5 sm:px-4 sm:py-2 rounded-md bg-emerald-500 text-white shadow-sm transition-all">JUDGE</button>
+                    <button onclick="switchView('grid')" id="btn-grid" class="px-3 py-1.5 sm:px-4 sm:py-2 rounded-md text-emerald-200 hover:text-white transition-all">GRID</button>
                     <button onclick="switchView('setup')" id="btn-setup" class="px-3 py-1.5 sm:px-4 sm:py-2 rounded-md text-emerald-200 hover:text-white transition-all">SETUP</button>
                 </div>
             </div>
@@ -68,6 +69,69 @@
             </div>
         </div>
         <div id="meet-container" class="space-y-12"></div>
+    </main>
+
+    <!-- VIEW 4: GRID VIEW (ALL EVENTS) -->
+    <main id="view-grid" class="hidden max-w-5xl mx-auto px-4 mt-6"> <!-- Increased max-width slightly for more columns -->
+        <div class="flex items-center mb-6">
+            <button onclick="switchView('judge')" class="mr-4 text-emerald-600 text-xl"><i class="fas fa-arrow-left"></i></button>
+            <h2 class="font-display text-emerald-800 text-2xl">Score Grid</h2>
+        </div >
+        
+        <!-- Spreadsheet Container -->
+        <div class="bg-white rounded-xl shadow-2xl overflow-hidden border border-gray-300">
+            <div class="overflow-x-auto">
+                <table class="w-full border-collapse text-sm">
+                    <thead class="bg-gray-100 text-gray-600 uppercase text-[10px] tracking-widest">
+                        <tr>
+                            <!-- Day Filter -->
+                            <th class="border border-gray-300 p-1 text-center font-bold w-[8%]">
+                                <div class="flex flex-col items-center">
+                                    <span>Day</span>
+                                    <select id="filter-day" onchange="handleFilterChange('day', this.value)" class="mt-1 text-[9px] font-normal bg-transparent border border-gray-300 rounded px-1 outline-none focus:ring-1 focus:ring-emerald-500">
+                                        <option value="">All</option>
+                                    </select>
+                                </div>
+                            </th>
+                            <!-- Period Filter -->
+                            <th class="border border-gray-300 p-1 text-left font-bold w-[15%]">
+                                <div class="flex flex-col">
+                                    <span>Period</span>
+                                    <select id="filter-period" onchange="handleFilterChange('period', this.value)" class="mt-1 text-[9px] font-normal bg-transparent border border-gray-300 rounded px-1 outline-none focus:ring-1 focus:ring-emerald-500">
+                                        <option value="">All</option>
+                                    </select>
+                                </div>
+                            </th>
+                            <!-- Activity Filter -->
+                            <th class="border border-gray-300 p-1 text-left font-bold w-[22%]">
+                                <div class="flex flex-col">
+                                    <span>Activity</span>
+                                    <select id="filter-activity" onchange="handleFilterChange('activity', this.value)" class="mt-1 text-[9px] font-normal bg-transparent border border-gray-300 rounded px-1 outline-none focus:ring-1 focus:ring-emerald-500">
+                                        <option value="">All</option>
+                                    </select>
+                                </div>
+                            </th>
+                            <!-- Group Filter -->
+                            <th class="border border-gray-300 p-1 text-left font-bold w-[18%]">
+                                <div class="flex flex-col">
+                                    <span>Group</span>
+                                    <select id="filter-group" onchange="handleFilterChange('group', this.value)" class="mt-1 text-[9px] font-normal bg-transparent border border-gray-300 rounded px-1 outline-none focus:ring-1 focus:ring-emerald-500">
+                                        <option value="">All</option>
+                                    </select>
+                                </div>
+                            </th>
+                            <th class="border border-gray-300 p-2 text-center font-bold bg-emerald-50 text-emerald-700 w-[17%]">Green</th>
+                            <th class="border border-gray-300 p-2 text-center font-bold bg-slate-50 text-slate-700 w-[17%]">White</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="grid-table-body" class="divide-y divide-gray-200">
+                        <!-- Rows injected by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <p class="mt-4 text-[10px] text-gray-400 italic text-center">Tip: Enter scores directly into the cells. Non-standard scores will be highlighted in yellow.</p>
     </main>
 
     <!-- VIEW 3: SETUP VIEW -->
@@ -413,7 +477,7 @@
             { id: 3, name: 'Soccer', scorer: 'standard', rules: ['Standard soccer rules apply.', 'Junior camp 7 minute quarters', 'Senior camp 15 minute halves', 'Staff 20 minute halves'] },
             { id: 4, name: 'Frolf', scorer: 'standard', rules: ['Each team has two players.', 'First team to 10 points wins', 'Must win by 2 points'] },
             { id: 5, name: 'Dodgeball', scorer: 'standard', rules: ['A player hit the ball is out.', 'If a player catches the ball, the thrower is out.', 'Last team standing wins', 'Best of 3 games'] },
-            { id: 6, name: 'Gagaball', scorer: 'standard', rules: ['Player hit by the ball below the waist is out.', 'If a player hits the ball twice with it hitting a wall or another player they are out.', 'Last team standing wins', 'Best of 3 games'] },
+            { id: 6, name: 'Gaga', scorer: 'standard', rules: ['Player hit by the ball below the waist is out.', 'If a player hits the ball twice with it hitting a wall or another player they are out.', 'Last team standing wins', 'Best of 3 games'] },
             { id: 7, name: 'Basketball', scorer: 'standard', rules: ['Standard Basketball rules apply.', 'Junior camp 7 minute quarters', 'Senior camp 15 minute halves', 'Staff 20 minute halves'] },
             { id: 8, name: 'Volleyball', scorer: 'standard', rules: ['Standard volleyball rules apply.', 'First to 21 with the game', 'Must win by 2 points', 'Open scoring', 'Switch sides when game score adds to 11', 'Best of 3 games'] },
             { id: 9, name: 'Tennis', scorer: 'custom', rules: ['5 G+W points per game', '2 Singles', '2 Doubles', 'Each match is a 8 game pro set'] }
@@ -437,6 +501,14 @@
         let selectedStandardOption = null;
         let selectedWinner = null;
 
+        // --- FILTER STATE ---
+        let activeFilters = {
+            day: '',
+            period: '',
+            activity: '',
+            group: ''
+        };
+        
         // --- INITIALIZATION ---
         function init() {
             populateRegularActivities();
@@ -537,16 +609,39 @@
         // --- VIEW SWITCHING ---
         function switchView(view) {
             currentView = view;
-            ['view-judge', 'view-setup', 'view-meet'].forEach(v => {
-                document.getElementById(v).classList.add('hidden');
-            });
-            document.getElementById('view-' + view).classList.remove('hidden');
             
-            document.getElementById('btn-judge').className = view === 'judge' ? "px-4 py-2 rounded-md bg-emerald-500 text-white shadow-sm transition-all" : "px-4 py-2 rounded-md text-emerald-200 hover:text-white transition-all";
-            document.getElementById('btn-setup').className = view === 'setup' ? "px-4 py-2 rounded-md bg-emerald-500 text-white shadow-sm transition-all" : "px-4 py-2 rounded-md text-emerald-200 hover:text-white transition-all";
+            // 1. Hide all possible main views
+            ['view-judge', 'view-setup', 'view-meet', 'view-grid'].forEach(v => {
+                const el = document.getElementById(v);
+                if (el) el.classList.add('hidden');
+            });
 
+            // 2. Show the selected view
+            const targetView = document.getElementById('view-' + view);
+            if (targetView) targetView.classList.remove('hidden');
+            
+            // 3. Update Button Styles (Handles Judge, Grid, and Setup)
+            const buttons = {
+                'judge': document.getElementById('btn-judge'),
+                'grid': document.getElementById('btn-grid'),
+                'setup': document.getElementById('btn-setup')
+            };
+
+            Object.keys(buttons).forEach(key => {
+                if (key === view) {
+                    // Active state
+                    buttons[key].className = "px-3 py-1.5 sm:px-4 sm:py-2 rounded-md bg-emerald-500 text-white shadow-sm transition-all";
+                } else {
+                    // Inactive state
+                    buttons[key].className = "px-3 py-1.5 sm:px-4 sm:py-2 rounded-md text-emerald-200 hover:text-white transition-all";
+                }
+            });
+
+            // 4. Trigger the specific Render function for the view
             if (view === 'judge') renderJudgeView();
             if (view === 'setup') renderSetupList();
+            if (view === 'grid') renderGridView(); // <--- THIS WAS MISSING
+
             window.scrollTo(0, 0);
         }
 
@@ -554,6 +649,106 @@
             currentDay = day;
             renderDayPicker();
             renderJudgeView();
+        }
+
+        function handleFilterChange(column, value) {
+            activeFilters[column] = value;
+            renderGridView();
+        }
+
+        // Helper to populate the dropdowns with unique values from the data
+        function populateFilterDropdowns() {
+            const daySelect = document.getElementById('filter-day');
+            const periodSelect = document.getElementById('filter-period');
+            const activitySelect = document.getElementById('filter-activity');
+            const groupSelect = document.getElementById('filter-group');
+
+            // 1. Collect all unique Days
+            const days = [...new Set(regularActivities.map(a => a.day.toString()))].sort((a,b) => a-b);
+            
+            // 2. Define the FIXED order for Periods
+            const periodOptions = ['', 'Morning', 'Rest Hour', 'Afternoon', 'Evening'];
+
+            // 3. Collect all unique Activity/Event names
+            const activityNames = new Set();
+            // From Regular
+            regularActivities.forEach(a => activityNames.add(getActivityNameById(a.activityId)));
+            // From Meets
+            meets.forEach(m => {
+                const config = MEET_CONFIGS[m.type];
+                if (config) config.events.forEach(e => activityNames.add(e.name));
+            });
+            // From All-Camp
+            allCampActivities.forEach(ac => {
+                const config = ALL_CAMP_CONFIGS[ac.type];
+                if (config) config.events.forEach(e => activityNames.add(e.name));
+            });
+
+            // 4. Collect all unique Groups (Scanning ALL activity types)
+            const groupSet = new Set();
+
+            // Add groups from Regular Activities
+            regularActivities.forEach(a => groupSet.add(a.group));
+
+            // Add groups from Meets
+            meets.forEach(m => {
+                const config = MEET_CONFIGS[m.type];
+                if (config) {
+                    config.events.forEach(e => {
+                        if (e.participants) {
+                            e.participants.forEach(p => groupSet.add(p));
+                        } else {
+                            // If no specific participants listed, it defaults to all GROUPS
+                            GROUPS.forEach(g => groupSet.add(g.name));
+                        }
+                    });
+                }
+            });
+
+            // Add groups from All-Camp Activities
+            allCampActivities.forEach(ac => {
+                const config = ALL_CAMP_CONFIGS[ac.type];
+                if (config) {
+                    config.events.forEach(e => {
+                        if (e.participants) {
+                            e.participants.forEach(p => groupSet.add(p));
+                        } else {
+                            // If no specific participants listed, it defaults to all GROUPS
+                            GROUPS.forEach(g => groupSet.add(g.name));
+                        }
+                    });
+                }
+            });
+
+            const groups = Array.from(groupSet).sort();
+
+            // Helper to fill (used for Day, Activity, and Group which SHOULD be sorted)
+            const fill = (select, items, currentVal) => {
+                const val = select.value; // preserve current selection
+                select.innerHTML = '<option value="">All</option>';
+                Array.from(items).sort().forEach(item => {
+                    const opt = document.createElement('option');
+                    opt.value = item;
+                    opt.innerText = item;
+                    if (item === val) opt.selected = true;
+                    select.appendChild(opt);
+                });
+            };
+
+            // Apply Day, Activity, and Group filters using the sorted helper
+            fill(daySelect, days, activeFilters.day);
+            fill(activitySelect, Array.from(activityNames), activeFilters.activity);
+            fill(groupSelect, groups, activeFilters.group);
+
+            // Apply Period filter MANUALLY to maintain your specific order
+            periodSelect.innerHTML = '';
+            periodOptions.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p; // "" for All, or the period name
+                opt.innerText = p === '' ? 'All' : p;
+                if (p === activeFilters.period) opt.selected = true;
+                periodSelect.appendChild(opt);
+            });
         }
 
         // --- RENDERERS ---
@@ -866,6 +1061,24 @@
                 return;
             }
 
+            const key = `${type}|${event.name}|${participantName}`;
+            const existingScore = meetScores[key];
+            
+            let isReadOnly = false;
+            if (existingScore) {
+                const pts = event.points || 20; // simplistic check
+                const valid = (existingScore.g === pts && existingScore.w === 0) || 
+                            (existingScore.g === 0 && existingScore.w === pts) ||
+                            (existingScore.g === pts/2 && existingScore.w === pts/2); // simplified
+                if (!valid) isReadOnly = true;
+            }
+
+            if (isReadOnly) {
+                const submitBtn = document.getElementById('btn-submit-meet');
+                submitBtn.disabled = true;
+                submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+
             activeMeetScore = { type, event: event.name, group: participantName, eventType: event.type, sequence: [] };
             document.getElementById('m-name').innerText = event.name;
             document.getElementById('m-type').innerText = event.type.toUpperCase();
@@ -976,6 +1189,24 @@
                 sequence: [],
                 points: eventPoints // Store it here for the submit function
             };
+
+            let isReadOnly = false;
+            if (existingScore) {
+                // Check if the points match the allowed winner/tie patterns
+                const valid = (existingScore.g === eventPoints && existingScore.w === 0) ||
+                            (existingScore.g === 0 && existingScore.w === eventPoints) ||
+                            (existingScore.g === eventPoints/2 && existingScore.w === eventPoints/2);
+                if (!valid) isReadOnly = true;
+            }
+
+            if (isReadOnly) {
+                const submitBtn = document.getElementById('btn-submit-winner');
+                submitBtn.disabled = true;
+                submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                document.getElementById('w-name').innerHTML += ' <span class="text-red-500 text-[10px] block">(INVALID SCORE - LOCKED)</span>';
+            } else {
+                document.getElementById('w-name').innerHTML = event.name;
+            }
 
             document.getElementById('w-name').innerText = event.name;
 
@@ -1115,17 +1346,25 @@
         function openRegularModal(act) {
             activeRegularScore = act;
             const activityData = activities.find(a => a.id === act.activityId);
+            const isWarning = act.isWarning || false;
 
+            // --- PATH 1: CUSTOM SCORER (Always Editable) ---
             if (activityData.scorer === 'custom') {
-                // --- NUMBER INPUT LOGIC ---
                 document.getElementById('r-target').innerText = act.group;
                 document.getElementById('r-activity').innerText = getActivityNameById(act.activityId);
                 document.getElementById('r-period').innerText = act.period;
                 document.getElementById('r-score-g').value = act.scored ? act.g : '';
                 document.getElementById('r-score-w').value = act.scored ? act.w : '';
                 
+                // Populate Custom Rules
                 const rulesList = document.getElementById('r-rules-list');
                 rulesList.innerHTML = '';
+                if (act.scored) {
+                    const scoreSummary = document.createElement('div');
+                    scoreSummary.className = `text-center p-2 rounded-lg mb-2 text-xs font-bold ${isWarning ? 'bg-yellow-100 text-yellow-700' : 'bg-gray-100 text-gray-600'}`;
+                    scoreSummary.innerText = `CURRENT SCORE: G: ${act.g} - W: ${act.w}`;
+                    rulesList.appendChild(scoreSummary);
+                }
                 if (activityData && activityData.rules.length > 0) {
                     activityData.rules.forEach(rule => {
                         const li = document.createElement('li');
@@ -1134,17 +1373,31 @@
                         rulesList.appendChild(li);
                     });
                 } else {
-                    rulesList.innerHTML = '<li class="italic">No specific rules defined for this activity.</li>';
+                    rulesList.innerHTML = '<li class="italic text-gray-400">No specific rules defined.</li>';
                 }
+
                 document.getElementById('regularModal').classList.remove('hidden');
                 
-            } else {
-                // --- BUTTON-BASED LOGIC ---
+            } 
+            // --- PATH 2: STANDARD SCORER (Read-Only if Non-Standard) ---
+            else {
+                // 1. Set Activity Name and Warning Score
+                const activityLabel = document.getElementById('s-activity');
+                if (isWarning) {
+                    activityLabel.innerHTML = `
+                        ${getActivityNameById(act.activityId)} 
+                        <span class="text-yellow-600 text-[11px] block font-black tracking-tight">
+                            SCORE: G: ${act.g} - W: ${act.w}
+                        </span>`;
+                } else {
+                    activityLabel.innerHTML = getActivityNameById(act.activityId);
+                }
+
+                // 2. Set Period and Target
                 document.getElementById('s-target').innerText = act.group;
                 document.getElementById('s-period').innerText = act.period;
-                document.getElementById('s-activity').innerText = getActivityNameById(act.activityId);
-                
-                // NEW: Populate the rules for the Standard Scorer
+
+                // 3. Populate Standard Rules (Ensuring this always runs)
                 const sRulesList = document.getElementById('s-rules-list');
                 sRulesList.innerHTML = '';
                 if (activityData && activityData.rules.length > 0) {
@@ -1155,26 +1408,35 @@
                         sRulesList.appendChild(li);
                     });
                 } else {
-                    sRulesList.innerHTML = '<li class="italic">No specific rules defined for this activity.</li>';
+                    sRulesList.innerHTML = '<li class="italic text-gray-400">No specific rules defined.</li>';
                 }
 
-                // Reset UI state
-                if (act.scored) {
-                    // Determine which option was previously selected based on the points logic
-                    let existingOption = null;
-                    if (act.g === 20 && act.w === 0) existingOption = 'G';
-                    else if (act.w === 20 && act.g === 0) existingOption = 'W';
-                    else if (act.g === 10 && act.w === 10) existingOption = 'T';
-
-                    if (existingOption) {
-                        selectStandardOption(existingOption);
-                    } else {
-                        // Fallback if data is inconsistent
-                        resetStandardUI();
-                    }
+                // 4. Apply Read-Only logic
+                if (isWarning) {
+                    // Disable Buttons
+                    ['G', 'W', 'T'].forEach(opt => {
+                        const btn = document.getElementById(`btn-score-${opt}`);
+                        btn.disabled = true;
+                        btn.classList.add('opacity-40', 'cursor-not-allowed');
+                        btn.classList.remove('ring-4', 'ring-emerald-400', 'ring-offset-2');
+                    });
+                    // Disable Submit
+                    const submitBtn = document.getElementById('btn-submit-standard');
+                    submitBtn.disabled = true;
+                    submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
                 } else {
-                    // If not scored, reset to default empty state
+                    // Enable and select existing score if valid
                     resetStandardUI();
+                    if (act.scored) {
+                        let existingOption = null;
+                        if (act.g === 20 && act.w === 0) existingOption = 'G';
+                        else if (act.w === 20 && act.g === 0) existingOption = 'W';
+                        else if (act.g === 10 && act.w === 10) existingOption = 'T';
+
+                        if (existingOption) {
+                            selectStandardOption(existingOption);
+                        }
+                    }
                 }
 
                 document.getElementById('standardRegularModal').classList.remove('hidden');
@@ -1185,11 +1447,13 @@
             selectedStandardOption = null;
             const submitBtn = document.getElementById('btn-submit-standard');
             submitBtn.disabled = true;
-            submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            
             ['G', 'W', 'T'].forEach(opt => {
                 const btn = document.getElementById(`btn-score-${opt}`);
-                btn.classList.remove('ring-4', 'ring-emerald-400', 'ring-offset-2');
-                btn.classList.add('opacity-50');
+                btn.disabled = false; // Re-enable buttons
+                btn.classList.remove('opacity-40', 'cursor-not-allowed', 'ring-4', 'ring-emerald-400', 'ring-offset-2');
+                btn.classList.add('opacity-100');
             });
         }
 
@@ -1280,7 +1544,179 @@
         }
 
         function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
-        
+
+        // --- GRID VIEW LOGIC ---
+        function renderGridView() {
+            populateFilterDropdowns();
+            const tbody = document.getElementById('grid-table-body');
+            tbody.innerHTML = '';
+
+            // 1. Define logical order for periods to ensure correct sorting
+            const periodOrder = { 
+                'Morning': 1, 
+                'Rest Hour': 2, 
+                'Afternoon': 3, 
+                'Evening': 4 
+            };
+
+            // 2. Create a unified array of all items that could appear in the grid
+            let allGridItems = [];
+
+            // --- Add Regular Activities ---
+            regularActivities.forEach(act => {
+                allGridItems.push({
+                    category: 'reg',
+                    day: act.day,
+                    period: act.period,
+                    activityName: getActivityNameById(act.activityId),
+                    group: act.group,
+                    id: act.id, // This is a Number
+                    g: act.g,
+                    w: act.w,
+                    isWarning: act.isWarning || false
+                });
+            });
+
+            // --- Add Meets ---
+            meets.forEach(item => {
+                const config = MEET_CONFIGS[item.type];
+                if (!config) return;
+
+                config.events.forEach(event => {
+                    // Determine participants
+                    const participants = event.participants 
+                        ? event.participants.map(p => ({ name: p })) 
+                        : GROUPS.map(g => ({ name: g.name }));
+
+                    participants.forEach(p => {
+                        const key = `${item.type}|${event.name}|${p.name}`;
+                        const score = meetScores[key] || { g: 0, w: 0 };
+                        allGridItems.push({
+                            category: 'complex',
+                            day: item.day,
+                            period: item.period,
+                            activityName: event.name,
+                            group: p.name,
+                            id: key, // This is a String (the unique key)
+                            g: score.g,
+                            w: score.w
+                        });
+                    });
+                });
+            });
+
+            // --- Add All-Camp Activities ---
+            allCampActivities.forEach(item => {
+                const config = ALL_CAMP_CONFIGS[item.type];
+                if (!config) return;
+
+                config.events.forEach(event => {
+                    // Determine participants
+                    const participants = event.participants 
+                        ? event.participants.map(p => ({ name: p })) 
+                        : GROUPS.map(g => ({ name: g.name }));
+
+                    participants.forEach(p => {
+                        const key = `${item.type}|${event.name}|${p.name}`;
+                        const score = meetScores[key] || { g: 0, w: 0 };
+                        allGridItems.push({
+                            category: 'complex',
+                            day: item.day,
+                            period: item.period,
+                            activityName: event.name,
+                            group: p.name,
+                            id: key, // This is a String (the unique key)
+                            g: score.g,
+                            w: score.w
+                        });
+                    });
+                });
+            });
+
+            // 3. Apply Filters
+            const filtered = allGridItems.filter(item => {
+                const matchDay = activeFilters.day === '' || item.day.toString() === activeFilters.day;
+                const matchPeriod = activeFilters.period === '' || item.period === activeFilters.period;
+                const matchActivity = activeFilters.activity === '' || item.activityName === activeFilters.activity;
+                const matchGroup = activeFilters.group === '' || item.group === activeFilters.group;
+                return matchDay && matchPeriod && matchActivity && matchGroup;
+            });
+
+            // 4. Sort by Day, then by Period Order
+            filtered.sort((a, b) => {
+                if (a.day !== b.day) return a.day - b.day;
+                return periodOrder[a.period] - periodOrder[b.period];
+            });
+
+            // 5. Render the sorted/filtered rows
+            filtered.forEach(item => {
+                const row = document.createElement('tr');
+                row.className = `hover:bg-blue-50 transition-colors ${item.isWarning ? 'bg-red-50' : ''}`;
+                
+                // Determine if the ID is a number (Regular) or string (Meet/AC) 
+                // to use the correct syntax for the onchange handler
+                const isReg = typeof item.id === 'number';
+                const idPart = isReg ? item.id : `'${item.id}'`;
+                
+                row.innerHTML = `
+                    <td class="border border-gray-300 p-2 text-center text-gray-500 font-medium">${item.day}</td>
+                    <td class="border border-gray-300 p-2 text-xs text-gray-600">${item.period}</td>
+                    <td class="border border-gray-300 p-2 text-xs text-gray-600">${item.activityName}</td>
+                    <td class="border border-gray-300 p-2 text-xs text-gray-600">${item.group}</td>
+                    <td class="border border-gray-300 p-0">
+                        <input type="number" step="0.25" value="${item.g}" 
+                            onchange="handleGridInputChange(${idPart}, 'g', this.value)"
+                            class="w-full h-full min-h-[44px] text-center bg-transparent focus:bg-white focus:ring-2 focus:ring-inset focus:ring-emerald-500 outline-none py-2 ${item.isWarning ? 'text-red-600 font-bold' : 'text-emerald-700'}">
+                    </td>
+                    <td class="border border-gray-300 p-0">
+                        <input type="number" step="0.25" value="${item.w}" 
+                            onchange="handleGridInputChange(${idPart}, 'w', this.value)"
+                            class="w-full h-full min-h-[44px] text-center bg-transparent focus:bg-white focus:ring-2 focus:ring-inset focus:ring-emerald-500 outline-none py-2 ${item.isWarning ? 'text-red-600 font-bold' : 'text-gray-700'}">
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function handleGridInputChange(id, field, value) {
+            const val = parseFloat(value) || 0;
+
+            // 1. Check if it's a Regular Activity (ID is a number)
+            const act = regularActivities.find(a => a.id === id);
+            
+            if (act) {
+                if (field === 'g') act.g = val;
+                if (field === 'w') act.w = val;
+                act.scored = true;
+
+                // Validation Logic for Standard Scoring
+                const activityData = activities.find(a => a.id === act.activityId);
+                act.isWarning = false; 
+                if (activityData?.scorer === 'standard') {
+                    const valid = (act.g === 20 && act.w === 0) || 
+                                (act.g === 0 && act.w === 20) || 
+                                (act.g === 10 && act.w === 10);
+                    if (!valid) act.isWarning = true;
+                }
+            } 
+            // 2. It's a Meet/All-Camp Key (ID is a string like "swim|Event|Group")
+            else {
+                const key = id; 
+                
+                // CRITICAL FIX: Initialize the object if it doesn't exist yet
+                if (!meetScores[key]) {
+                    meetScores[key] = { g: 0, w: 0 };
+                }
+
+                if (field === 'g') meetScores[key].g = val;
+                if (field === 'w') meetScores[key].w = val;
+            }
+
+            // 3. Update the totals and re-render to apply any color changes
+            updateGlobalScore();
+            renderGridView();
+        }
+
         init();
     </script>
 </body>
