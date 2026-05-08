@@ -80,48 +80,48 @@
         
         <!-- Spreadsheet Container -->
         <div class="bg-white rounded-xl shadow-2xl overflow-hidden border border-gray-300">
-            <div class="overflow-x-auto">
-                <table class="w-full border-collapse text-sm">
-                    <thead class="bg-gray-100 text-gray-600 uppercase text-[10px] tracking-widest">
+            <div class="overflow-x-auto overflow-y-auto max-h-[70vh]"> <!-- Added max-height and overflow-y to create a scrollable area -->
+                <table class="w-full border-separate border-spacing-0 text-sm"> <!-- Changed to border-separate -->
+                    <thead class="text-gray-600 uppercase text-[10px] tracking-widest">
                         <tr>
                             <!-- Day Filter -->
-                            <th class="border border-gray-300 p-1 text-center font-bold w-[8%]">
+                            <th class="sticky top-0 z-10 bg-gray-100 border border-gray-300 p-1 text-center font-bold w-[8%]">
                                 <div class="flex flex-col items-center">
-                                    <span>Day</span>
+                                    <span class="text-gray-600">Day</span>
                                     <select id="filter-day" onchange="handleFilterChange('day', this.value)" class="mt-1 text-[9px] font-normal bg-transparent border border-gray-300 rounded px-1 outline-none focus:ring-1 focus:ring-emerald-500">
                                         <option value="">All</option>
                                     </select>
                                 </div>
                             </th>
                             <!-- Period Filter -->
-                            <th class="border border-gray-300 p-1 text-left font-bold w-[15%]">
+                            <th class="sticky top-0 z-10 bg-gray-100 border border-gray-300 p-1 text-left font-bold w-[15%]">
                                 <div class="flex flex-col">
-                                    <span>Period</span>
+                                    <span class="text-gray-600">Period</span>
                                     <select id="filter-period" onchange="handleFilterChange('period', this.value)" class="mt-1 text-[9px] font-normal bg-transparent border border-gray-300 rounded px-1 outline-none focus:ring-1 focus:ring-emerald-500">
                                         <option value="">All</option>
                                     </select>
                                 </div>
                             </th>
                             <!-- Activity Filter -->
-                            <th class="border border-gray-300 p-1 text-left font-bold w-[22%]">
+                            <th class="sticky top-0 z-10 bg-gray-100 border border-gray-300 p-1 text-left font-bold w-[22%]">
                                 <div class="flex flex-col">
-                                    <span>Activity</span>
+                                    <span class="text-gray-600">Activity</span>
                                     <select id="filter-activity" onchange="handleFilterChange('activity', this.value)" class="mt-1 text-[9px] font-normal bg-transparent border border-gray-300 rounded px-1 outline-none focus:ring-1 focus:ring-emerald-500">
                                         <option value="">All</option>
                                     </select>
                                 </div>
                             </th>
                             <!-- Group Filter -->
-                            <th class="border border-gray-300 p-1 text-left font-bold w-[18%]">
+                            <th class="sticky top-0 z-10 bg-gray-100 border border-gray-300 p-1 text-left font-bold w-[18%]">
                                 <div class="flex flex-col">
-                                    <span>Group</span>
+                                    <span class="text-gray-600">Group</span>
                                     <select id="filter-group" onchange="handleFilterChange('group', this.value)" class="mt-1 text-[9px] font-normal bg-transparent border border-gray-300 rounded px-1 outline-none focus:ring-1 focus:ring-emerald-500">
                                         <option value="">All</option>
                                     </select>
                                 </div>
                             </th>
-                            <th class="border border-gray-300 p-2 text-center font-bold bg-emerald-50 text-emerald-700 w-[17%]">Green</th>
-                            <th class="border border-gray-300 p-2 text-center font-bold bg-slate-50 text-slate-700 w-[17%]">White</th>
+                            <th class="sticky top-0 z-10 bg-emerald-50 text-emerald-700 border border-gray-300 p-2 text-center font-bold w-[17%]">Green</th>
+                            <th class="sticky top-0 z-10 bg-slate-50 text-slate-700 border border-gray-300 p-2 text-center font-bold w-[17%]">White</th>
                         </tr>
                     </thead>
 
