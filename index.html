@@ -120,6 +120,7 @@
                                     </select>
                                 </div>
                             </th>
+                            <th class="sticky top-0 z-10 bg-slate-50 text-slate-700 border border-gray-300 p-2 text-center font-boldw-[10%]">Scoring</th>
                             <th class="sticky top-0 z-10 bg-emerald-50 text-emerald-700 border border-gray-300 p-2 text-center font-bold w-[17%]">Green</th>
                             <th class="sticky top-0 z-10 bg-slate-50 text-slate-700 border border-gray-300 p-2 text-center font-bold w-[17%]">White</th>
                         </tr>
@@ -131,7 +132,6 @@
                 </table>
             </div>
         </div>
-        <p class="mt-4 text-[10px] text-gray-400 italic text-center">Tip: Enter scores directly into the cells. Non-standard scores will be highlighted in yellow.</p>
     </main>
 
     <!-- VIEW 3: SETUP VIEW -->
@@ -149,33 +149,6 @@
             </div>
             <button onclick="addRegularActivity()" class="w-full mt-6 bg-emerald-600 text-white font-display py-3 rounded-xl shadow-lg shadow-emerald-200">ADD ACTIVITY</button>
         </div>
-
-        <!-- All Camp Activity -->
-        <!--
-        <div class="bg-white rounded-3xl shadow-lg p-6 border-2 border-purple-100 mb-8 text-sm">
-            <h3 class="font-bold text-purple-700 mb-4 uppercase tracking-widest text-xs">Add All Camp Activity</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <select id="setup-ac-day" class="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none"><option value="1">Day 1</option><option value="2">Day 2</option><option value="3">Day 3</option><option value="4">Day 4</option><option value="5">Day 5</option></select>
-                <select id="setup-ac-period" class="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none"><option>Morning</option><option>Rest Hour</option><option>Afternoon</option><option>Evening</option></select>
-                <select id="setup-ac-type" class="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none" onchange="updateACActivityList()"></select>
-                <select id="setup-ac-event" class="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none"></select>
-            </div>
-            <button onclick="addAllCampActivity()" class="w-full mt-6 bg-purple-600 text-white font-display py-3 rounded-xl shadow-lg shadow-purple-200">ADD ALL CAMP EVENT</button>
-        </div>
-        -->
-
-        <!-- Meet -->
-        <!--
-        <div class="bg-white rounded-3xl shadow-lg p-6 border-2 border-orange-100 mb-8 text-sm">
-            <h3 class="font-bold text-orange-700 mb-4 uppercase tracking-widest text-xs">Add Meet</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <select id="setup-meet-day" class="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none"><option value="1">Day 1</option><option value="2">Day 2</option><option value="3">Day 3</option><option value="4">Day 4</option><option value="5">Day 5</option></select>
-                <select id="setup-meet-period" class="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none"><option>Morning</option><option>Rest Hour</option><option>Afternoon</option><option>Evening</option></select>
-                <select id="setup-meet-type" class="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none"></select>
-            </div>
-            <button onclick="addMeet()" class="w-full mt-6 bg-orange-600 text-white font-display py-3 rounded-xl shadow-lg shadow-orange-200">ADD MEET</button>
-        </div>
-        -->
 
         <div class="bg-white rounded-3xl shadow-lg p-6 border-2 border-emerald-100">
             <h3 class="font-bold text-emerald-700 mb-4 uppercase tracking-widest text-xs">Current Schedule</h3>
@@ -480,7 +453,7 @@
             { id: 6, name: 'Gaga', scorer: 'standard', rules: ['Player hit by the ball below the waist is out.', 'If a player hits the ball twice with it hitting a wall or another player they are out.', 'Last team standing wins', 'Best of 3 games'] },
             { id: 7, name: 'Basketball', scorer: 'standard', rules: ['Standard Basketball rules apply.', 'Junior camp 7 minute quarters', 'Senior camp 15 minute halves', 'Staff 20 minute halves'] },
             { id: 8, name: 'Volleyball', scorer: 'standard', rules: ['Standard volleyball rules apply.', 'First to 21 with the game', 'Must win by 2 points', 'Open scoring', 'Switch sides when game score adds to 11', 'Best of 3 games'] },
-            { id: 9, name: 'Tennis', scorer: 'custom', rules: ['5 G+W points per game', '2 Singles', '2 Doubles', 'Each match is a 8 game pro set'] }
+            { id: 9, name: 'Tennis', scorer: 'custom', scoring: '5/match', rules: ['5 G+W points per game', '2 Singles', '2 Doubles', 'Each match is a 8 game pro set'] }
         ];
         let meets = [
             { type: 'swim', day: 2, period: 'Morning' },
@@ -1203,7 +1176,7 @@
                 const submitBtn = document.getElementById('btn-submit-winner');
                 submitBtn.disabled = true;
                 submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
-                document.getElementById('w-name').innerHTML += ' <span class="text-red-500 text-[10px] block">(INVALID SCORE - LOCKED)</span>';
+                document.getElementById('w-name').innerHTML += ' <span class="text-yellow-500 text-[10px] block">(NON-STANDARD SCORE - LOCKED)</span>';
             } else {
                 document.getElementById('w-name').innerHTML = event.name;
             }
@@ -1551,29 +1524,25 @@
             const tbody = document.getElementById('grid-table-body');
             tbody.innerHTML = '';
 
-            // 1. Define logical order for periods to ensure correct sorting
-            const periodOrder = { 
-                'Morning': 1, 
-                'Rest Hour': 2, 
-                'Afternoon': 3, 
-                'Evening': 4 
-            };
-
-            // 2. Create a unified array of all items that could appear in the grid
+            const periodOrder = { 'Morning': 1, 'Rest Hour': 2, 'Afternoon': 3, 'Evening': 4 };
             let allGridItems = [];
 
             // --- Add Regular Activities ---
             regularActivities.forEach(act => {
+                const activityData = activities.find(a => a.id === act.activityId);
                 allGridItems.push({
                     category: 'reg',
                     day: act.day,
                     period: act.period,
                     activityName: getActivityNameById(act.activityId),
                     group: act.group,
-                    id: act.id, // This is a Number
+                    id: act.id,
                     g: act.g,
                     w: act.w,
-                    isWarning: act.isWarning || false
+                    isWarning: act.isWarning || false,
+                    eventType: activityData?.scorer || 'custom',
+                    points: 20,
+                    scoring: activityData?.scoring || '' // <--- ADD THIS LINE
                 });
             });
 
@@ -1581,9 +1550,7 @@
             meets.forEach(item => {
                 const config = MEET_CONFIGS[item.type];
                 if (!config) return;
-
                 config.events.forEach(event => {
-                    // Determine participants
                     const participants = event.participants 
                         ? event.participants.map(p => ({ name: p })) 
                         : GROUPS.map(g => ({ name: g.name }));
@@ -1597,9 +1564,12 @@
                             period: item.period,
                             activityName: event.name,
                             group: p.name,
-                            id: key, // This is a String (the unique key)
+                            id: key,
                             g: score.g,
-                            w: score.w
+                            w: score.w,
+                            // ADDED THESE TWO LINES:
+                            eventType: event.type,
+                            points: event.points || 20
                         });
                     });
                 });
@@ -1609,9 +1579,7 @@
             allCampActivities.forEach(item => {
                 const config = ALL_CAMP_CONFIGS[item.type];
                 if (!config) return;
-
                 config.events.forEach(event => {
-                    // Determine participants
                     const participants = event.participants 
                         ? event.participants.map(p => ({ name: p })) 
                         : GROUPS.map(g => ({ name: g.name }));
@@ -1625,15 +1593,18 @@
                             period: item.period,
                             activityName: event.name,
                             group: p.name,
-                            id: key, // This is a String (the unique key)
+                            id: key,
                             g: score.g,
-                            w: score.w
+                            w: score.w,
+                            // ADDED THESE TWO LINES:
+                            eventType: event.type,
+                            points: event.points || 20
                         });
                     });
                 });
             });
 
-            // 3. Apply Filters
+            // 3. Apply Filters (Keep existing logic)
             const filtered = allGridItems.filter(item => {
                 const matchDay = activeFilters.day === '' || item.day.toString() === activeFilters.day;
                 const matchPeriod = activeFilters.period === '' || item.period === activeFilters.period;
@@ -1642,36 +1613,49 @@
                 return matchDay && matchPeriod && matchActivity && matchGroup;
             });
 
-            // 4. Sort by Day, then by Period Order
             filtered.sort((a, b) => {
                 if (a.day !== b.day) return a.day - b.day;
                 return periodOrder[a.period] - periodOrder[b.period];
             });
 
-            // 5. Render the sorted/filtered rows
+            // 4. Render the sorted/filtered rows
             filtered.forEach(item => {
                 const row = document.createElement('tr');
-                row.className = `hover:bg-blue-50 transition-colors ${item.isWarning ? 'bg-red-50' : ''}`;
+                row.className = `hover:bg-blue-50 transition-colors ${item.isWarning ? 'bg-yellow-50' : ''}`;
                 
-                // Determine if the ID is a number (Regular) or string (Meet/AC) 
-                // to use the correct syntax for the onchange handler
                 const isReg = typeof item.id === 'number';
                 const idPart = isReg ? item.id : `'${item.id}'`;
                 
+                // Helper function to get the scoring string
+                const getScoringString = (itm) => {
+                    if (itm.category === 'reg') {
+                        if (itm.eventType === 'standard') return '20 0';
+                        if (itm.eventType === 'custom') return itm.scoring; // <--- ADD THIS LINE
+                    }
+                    
+                    if (itm.category === 'complex') {
+                        if (itm.eventType === 'ind') return '5 3 1 0';
+                        if (itm.eventType === 'winner') return `${itm.points} 0`;
+                        return '20 0'; // Default for relays/giants
+                    }
+                    return '';
+                };
+
                 row.innerHTML = `
                     <td class="border border-gray-300 p-2 text-center text-gray-500 font-medium">${item.day}</td>
                     <td class="border border-gray-300 p-2 text-xs text-gray-600">${item.period}</td>
                     <td class="border border-gray-300 p-2 text-xs text-gray-600">${item.activityName}</td>
                     <td class="border border-gray-300 p-2 text-xs text-gray-600">${item.group}</td>
-                    <td class="border border-gray-300 p-0">
+                    <td class="border border-gray-300 p-2 text-center text-[10px] text-gray-400 font-mono">${getScoringString(item)}</td>
+                    <td class="border border-gray-300 bg-emerald-50 p-0">
                         <input type="number" step="0.25" value="${item.g}" 
                             onchange="handleGridInputChange(${idPart}, 'g', this.value)"
-                            class="w-full h-full min-h-[44px] text-center bg-transparent focus:bg-white focus:ring-2 focus:ring-inset focus:ring-emerald-500 outline-none py-2 ${item.isWarning ? 'text-red-600 font-bold' : 'text-emerald-700'}">
+                            class="w-full h-full min-h-[44px] text-center bg-transparent focus:bg-white focus:ring-2 focus:ring-inset focus:ring-emerald-500 outline-none py-2 ${item.isWarning ? 'text-yellow-600 font-bold' : 'text-emerald-700'}">
                     </td>
                     <td class="border border-gray-300 p-0">
                         <input type="number" step="0.25" value="${item.w}" 
                             onchange="handleGridInputChange(${idPart}, 'w', this.value)"
-                            class="w-full h-full min-h-[44px] text-center bg-transparent focus:bg-white focus:ring-2 focus:ring-inset focus:ring-emerald-500 outline-none py-2 ${item.isWarning ? 'text-red-600 font-bold' : 'text-gray-700'}">
+                            class="w-full h-full min-h-[44px] text-center bg-transparent focus:bg-white focus:ring-2 focus:ring-inset focus:ring-emerald-500 outline-none py-2 ${item.isWarning ? 'text-yellow-600 font-bold' : 'text-gray-700'}">
                     </td>
                 `;
                 tbody.appendChild(row);
